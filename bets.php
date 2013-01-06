@@ -46,45 +46,75 @@ body
 <body>
 <?php
 include 'menu.php';
+include 'user.php';
 ?>
 <?php
 /* $IPBYPASS is used to get around the ip check so you are able to test bet creation locally */
-$IPBYPASS = TRUE;
+$IPBYPASS = FALSE;
 
-if(isset($_SESSION['loggedin'])) {
-        updatePoints(1, $_SESSION['name']);
-	include 'user.php';
-	
-	if(isset($_GET['mid'])) {
-             $match_ID = $_GET['mid'];
-             $match_ID = $mysqli->real_escape_string($match_ID); 
-             $result = $mysqli->query("SELECT * FROM `bets_matches` WHERE `ID`=$match_ID");
-                  $row = $result->fetch_array(MYSQLI_ASSOC);
-             if($row['ID'] === $match_ID) {
-                  if ($_SESSION['name'] === $row['Mod']) {
-                       echo "You are the moderator";
-                  }
-                  else if ($IP == $row['IP'] and !$IPBYPASS) {
-                       echo "You have the same IP as the moderator";
-                  } else {
-                       echo $row['Input 1'] .$row['Input 2'] .$row['Mod']
-                       ."<br />Select a bet from the list or"
-					   ."<br /><a href='createbet.php?mid=$match_ID'><img src='IS/createbet.jpg'></a>";
-                  }
-             } else {
-             echo "Error: Match does not exist in database.";
-             }
-        } else {
-             echo "
-             <form action='$_SERVER[PHP_SELF]' method='post'>
-             <input type='text' name='input1'><br />
-             VS<br />
-             <input type='text' name='input2'><br />
-             <input type='submit' name='submit' value='Submit' />";
-        }
-} else {
-	echo "<a href='signuppage.php'>Register</a><br/>";
-	echo "<a href='signinpage.php'>Log In</a>";
+if(isset($_SESSION['loggedin'])) 
+{
+ updatePoints(1, $_SESSION['name']);
+ if(isset($_GET['mid']) and !empty($_GET['mid']) and ctype_digit($_GET['mid'])) 
+ {
+  $match_ID = $_GET['mid'];
+  $match_ID = $mysqli->real_escape_string($match_ID); 
+  $Match = new MatchInfo($match_ID);
+  $matchid = $Match->getMatchID();             
+  $input1 = $Match->getInput1();
+  $input2 = $Match->getInput2();
+  $mod = $Match->getMod();
+  $modip = $Match->getModIP();
+  if($matchid == $match_ID) 
+  {
+   if ($_SESSION['name'] === $mod) 
+   {
+   echo "<h1>" . $input1 . "</h1>";
+   echo "<h4>VS</h4>";
+   echo "<h1>" . $input2 . "</h1>";
+   echo "You are the moderator";
+   }
+   else if ($IP == $modip and !$IPBYPASS) 
+   {
+    echo "<h1>" . $input1 . "</h1>";
+    echo "<h4>VS</h4>";
+    echo "<h1>" . $input2 . "</h1>";
+    echo "You have the same IP as the moderator";
+   } 
+   else
+   {
+    echo "<h1>" . $input1 . "</h1>";
+    echo "<h4>VS</h4>";
+    echo "<h1>" . $input2 . "</h1>";
+    echo "Moderator: <a href='players.php?user=" . $mod . "'>" . $mod . "</a>";
+    echo "<br />Select a bet from the list or"
+    ."<br /><a href='createbet.php?mid=$match_ID'><img src='IS/createbet.jpg'></a>";
+   }
+  } 
+  else
+  {
+   echo "Error: Match does not exist in database.<br>
+   <form action='$_SERVER[PHP_SELF]' method='post'>
+   <input type='text' name='input1'><br />
+   VS<br />
+   <input type='text' name='input2'><br />
+   <input type='submit' name='submit' value='Submit' />";
+  }
+ }
+ else 
+ {
+  echo "
+  <form action='$_SERVER[PHP_SELF]' method='post'>
+  <input type='text' name='input1'><br />
+  VS<br />
+  <input type='text' name='input2'><br />
+  <input type='submit' name='submit' value='Submit' />";
+ }
+} 
+else 
+{
+ echo "<a href='signuppage.php'>Register</a><br/>";
+ echo "<a href='signinpage.php'>Log In</a>";
 }
 ?>
 
