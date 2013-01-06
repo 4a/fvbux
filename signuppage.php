@@ -1,7 +1,7 @@
 <?php
 session_start();
 if(isset($_SESSION['loggedin'])) {
-  header('Location: players.php');
+	header('Location: players.php');
 }
 
 require('PHP/connect.php');
@@ -45,20 +45,19 @@ if(array_key_exists('submit',$_POST)) {
 		$Hasher = new PasswordHash(8, FALSE);
 
 		$hash = $Hasher->HashPassword($password);
-		echo "Hash: " . $hash . "<br />";
+//		echo "Hash: " . $hash . "<br />";
 
-		$check = $Hasher->CheckPassword($password, $hash);
-		if($check) {
-			echo "Check: " . $check . "<br />";
-		}
+		
 
-		if(!($stmt = $mysqli->prepare("INSERT INTO user VALUES (?,?,?,?)"))) {
+		if(!($stmt = $mysqli->prepare("INSERT INTO user VALUES (?,?,?,?,?,?)"))) {
 			echo "Prepare failed: (" . $mysqli->errno . ") " . $mysqli->error;
 		}
 
 		$id = null;
 		$points = 100;
-		if (!$stmt->bind_param("issi", $id, $username, $hash, $points)) {
+		$email = "";
+		$acclevel = "user";
+		if (!$stmt->bind_param("ississ", $id, $username, $hash, $email, $points, $acclevel)) {
 			echo "Binding parameters failed: (" . $stmt->errno . ") " . $stmt->error;
 		}
 
