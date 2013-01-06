@@ -8,7 +8,7 @@ require('PHP/functionlist.php');
 <meta http-equiv="Content-type" content="text/html;charset=UTF-8">
 <title>Fightan' /v/idya</title>
 <link rel="shortcut icon" href="FV.ico" >
-<link rel="stylesheet" type="text/css" href="CSS/newfightan.css">
+<link rel="stylesheet" type="text/css" href="CSS/newfightans.css">
 <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js" type="text/javascript"></script>
 <style>
 #user
@@ -38,9 +38,8 @@ $IP = $_SERVER['REMOTE_ADDR'];
 $IP = ip2long($IP);
 if(isset($_SESSION['loggedin'])) {
 //        updatePoints(1, $_SESSION['name']);
-  $totalpoints = getPoints($_SESSION['name']);
+	include 'user.php';
 	echo "
-        <div id='user'>$_SESSION[name] ($totalpoints) <img src='IS/menu_open.png' /> | <a href='PHP/signout.php'>Log Out</a></div>
         <div id='fvbux'>You have <br>
         $totalpoints
         <br>FVBux</div>
