@@ -48,6 +48,9 @@ body
 include 'menu.php';
 ?>
 <?php
+/* $IPBYPASS is used to get around the ip check so you are able to test bet creation locally */
+$IPBYPASS = TRUE;
+
 if(isset($_SESSION['loggedin'])) {
         updatePoints(1, $_SESSION['name']);
 	include 'user.php';
@@ -61,11 +64,12 @@ if(isset($_SESSION['loggedin'])) {
                   if ($_SESSION['name'] === $row['Mod']) {
                        echo "You are the moderator";
                   }
-                  else if ($IP == $row['IP']) {
+                  else if ($IP == $row['IP'] and !$IPBYPASS) {
                        echo "You have the same IP as the moderator";
                   } else {
                        echo $row['Input 1'] .$row['Input 2'] .$row['Mod']
-                       ."<br />some input boxes for bets?";
+                       ."<br />Select a bet from the list or"
+					   ."<br /><a href='createbet.php?mid=$match_ID'><img src='IS/createbet.jpg'></a>";
                   }
              } else {
              echo "Error: Match does not exist in database.";
