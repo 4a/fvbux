@@ -32,31 +32,28 @@ include 'menu.php';
 ?>
 <div id="main">
 <?php
-/*----------------------------------if url has user parameter--------------------------------------*/
+/*-------------------------------------if user parameter is set--------------------------------------*/
 if(isset($_GET['user'])) {
-             $username = $_GET['user'];
-             $username = $mysqli->real_escape_string($username); 
-             $result = $mysqli->query("SELECT * FROM user WHERE username='$username'");
-             $row = $result->fetch_array(MYSQLI_ASSOC);
-             
-             if($row['username'] === $username) {
-//TalkPHP_Gravatar.php was included in user.php so I commented this out for now
-//             include('PHP/TalkPHP_Gravatar.php');
+        $username = $_GET['user'];
+        $username = $mysqli->real_escape_string($username); 
+        $result = $mysqli->query("SELECT * FROM user WHERE username='$username'");
+        $row = $result->fetch_array(MYSQLI_ASSOC);             
+        if($row['username'] === $username) {
 	     $proGravatar = new TalkPHP_Gravatar();
 	     $proGravatar->setEmail($row['email']);
 	     $proGravatar->setSize(80);
 	     $progravurl = $proGravatar->getAvatar();
 	     echo "<img src='". $progravurl ."' alt='Gravatar' /> this is ". $username ."'s profile";
-             } else {
+	     if($_SESSION['name'] === $row['username']) {
+	     echo "and you are ". $username;}
+        } else {
              echo "Error: User does not exist.";
-             }
-/*-------------------------------------end user profile stuff--------------------------------------*/
-             
+        } 
 } else {
+/*-------------------------------------main page, what it should do with no profile parameter--------------------------------------*/
 
-/*-------------------------------------session stuff--------------------------------------*/
+/*-------------------------------------check if logged in--------------------------------------*/
 if(isset($_SESSION['loggedin'])) {
-//        updatePoints(1, $_SESSION['name']);
 	echo "
         <div id='fvbux'>You have <br>
         $totalpoints
@@ -95,7 +92,7 @@ echo "<div><div id='leaderboard' style='display:inline-block;background-color:bl
     
 echo "</div>
 
-<div id='matches' style='display:inline-block;background-color:black'>stuff to bet on<br>";
+<div id='matches' style='display:inline-block;background-color:black'>stuff to bet on | <a href='bets.php'>Create new match</a><br>";
 
 	if(!($stmt = $mysqli->prepare("SELECT `ID`, `Input 1`, `Input 2`, `Mod` FROM `bets_matches` ORDER BY `ID` DESC LIMIT 50"))) {
 		echo "Prepare failed: (" . $mysqli->errno . ") " . $mysqli->error;
