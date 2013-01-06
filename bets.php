@@ -6,7 +6,7 @@ $IP = $_SERVER['REMOTE_ADDR'];
 $IP = ip2long($IP);
 if(array_key_exists('submit',$_POST)) {
         $input1 = $_POST['input1'];
-  $input2 = $_POST['input2'];
+	$input2 = $_POST['input2'];
 	createMatch($input1, $input2, $_SESSION['name'], $IP);
 	header('Location:bets.php?mid='.$newID);
 }
@@ -17,7 +17,7 @@ if(array_key_exists('submit',$_POST)) {
 <meta http-equiv="Content-type" content="text/html;charset=UTF-8">
 <title>Fightan' /v/idya</title>
 <link rel="shortcut icon" href="FV.ico" >
-<link rel="stylesheet" type="text/css" href="CSS/newfightan.css">
+<link rel="stylesheet" type="text/css" href="CSS/newfightans.css">
 <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js" type="text/javascript"></script>
 <style>
 body
@@ -50,10 +50,11 @@ include 'menu.php';
 <?php
 if(isset($_SESSION['loggedin'])) {
         updatePoints(1, $_SESSION['name']);
-        echo "<div id='user'>$_SESSION[name] ($totalpoints) <img src='IS/menu_open.png' /> | <a href='PHP/signout.php'>Log Out</a></div>";
-
+	include 'user.php';
+	
 	if(isset($_GET['mid'])) {
              $match_ID = $_GET['mid'];
+             $match_ID = $mysqli->real_escape_string($match_ID); 
              $result = $mysqli->query("SELECT * FROM `bets_matches` WHERE `ID`=$match_ID");
                   $row = $result->fetch_array(MYSQLI_ASSOC);
              if($row['ID'] === $match_ID) {
