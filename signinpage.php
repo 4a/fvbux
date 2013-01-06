@@ -44,8 +44,8 @@ if(array_key_exists('submit',$_POST)) {
 <head>
 <meta http-equiv="Content-type" content="text/html;charset=UTF-8">
 <title>Fightan' /v/idya</title>
-<link rel="shortcut icon" href="../FV.ico" >
-<link rel="stylesheet" type="text/css" href="../CSS/newfightan.css">
+<link rel="shortcut icon" href="FV.ico" >
+<link rel="stylesheet" type="text/css" href="CSS/newfightan.css">
 <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js" type="text/javascript"></script>
 <style>
 #user
