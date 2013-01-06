@@ -1,7 +1,7 @@
 <?php
 session_start();
 if(isset($_SESSION['loggedin'])) {
-  header('Location: players.php');
+	header('Location: players.php');
 }
 
 $errlogin = "";
@@ -12,7 +12,7 @@ if(array_key_exists('submit',$_POST)) {
 	$username = $_POST['username'];
 	$password = $_POST['password'];
 
-	if(!($stmt = $mysqli->prepare("SELECT password FROM user WHERE username=?"))) {
+	if(!($stmt = $mysqli->prepare("SELECT password, email, acclevel FROM user WHERE username=?"))) {
 		echo "Prepare failed: (" . $mysqli->errno . ") " . $mysqli->error;
 	}
 
@@ -24,13 +24,15 @@ if(array_key_exists('submit',$_POST)) {
 		echo "Execute failed: (" . $stmt->errno . ") " . $stmt->error;
 	}
 
-	$stmt->bind_result($passhash);
+	$stmt->bind_result($passhash, $email, $acclevel);
 	$stmt->fetch();
 	$Hasher = new PasswordHash(8, FALSE);
 
 	if($Hasher->CheckPassword($password, $passhash)) {
 		$_SESSION["loggedin"] = "yes";
 		$_SESSION['name'] = $username;
+		$_SESSION['level'] = $acclevel;
+		$_SESSION['email'] = $email;
 		header('Location: ../players.php');
 	} else {
 		$errlogin = "Username and password combination is not valid";
