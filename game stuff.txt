@@ -28,4 +28,4 @@ echo " | ". $profile->OnlineStatus;
 echo "<br>Steam: ". $steamprofile->personaname."<br>";  
 echo $steamprofile->personastate ? 'Online' : 'Offline';
 echo " | Last Online: ". date('Y-m-d h:i:s',$steamprofile->lastlogoff);
-?>
+?> 
