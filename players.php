@@ -1,6 +1,7 @@
 <?php
 session_start();
 require('PHP/functionlist.php');
+include 'user.php';
 ?>
 <!DOCTYPE HTML>
 <html>
@@ -18,13 +19,9 @@ require('PHP/functionlist.php');
   top:15px;
   right:30px;
 }
-#fvbux
+#main
 {
   display:block;
-  text-align:center;
-}
-#create
-{
   text-align:center;
 }
 </style>
@@ -33,12 +30,33 @@ require('PHP/functionlist.php');
 <?php
 include 'menu.php';
 ?>
+<div id="main">
 <?php
-$IP = $_SERVER['REMOTE_ADDR'];
-$IP = ip2long($IP);
+/*----------------------------------if url has user parameter--------------------------------------*/
+if(isset($_GET['user'])) {
+             $username = $_GET['user'];
+             $username = $mysqli->real_escape_string($username); 
+             $result = $mysqli->query("SELECT * FROM user WHERE username='$username'");
+             $row = $result->fetch_array(MYSQLI_ASSOC);
+             
+             if($row['username'] === $username) {
+//TalkPHP_Gravatar.php was included in user.php so I commented this out for now
+//             include('PHP/TalkPHP_Gravatar.php');
+	     $proGravatar = new TalkPHP_Gravatar();
+	     $proGravatar->setEmail($row['email']);
+	     $proGravatar->setSize(80);
+	     $progravurl = $proGravatar->getAvatar();
+	     echo "<img src='". $progravurl ."' alt='Gravatar' /> this is ". $username ."'s profile";
+             } else {
+             echo "Error: User does not exist.";
+             }
+/*-------------------------------------end user profile stuff--------------------------------------*/
+             
+} else {
+
+/*-------------------------------------session stuff--------------------------------------*/
 if(isset($_SESSION['loggedin'])) {
 //        updatePoints(1, $_SESSION['name']);
-	include 'user.php';
 	echo "
         <div id='fvbux'>You have <br>
         $totalpoints
@@ -49,6 +67,12 @@ if(isset($_SESSION['loggedin'])) {
 	echo "<a href='signuppage.php'>Register</a><br/>";
 	echo "<a href='signinpage.php'>Log In</a>";
 }
+}
+/*-------------------------------------end of session stuff--------------------------------------*/
+
+//VV this stuff should probably be includes VV
+
+/*-------------------------------------leaderboard--------------------------------------*/
 echo "<div><div id='leaderboard' style='display:inline-block;background-color:black'>leaedr board<br>";
 
 	if(!($stmt = $mysqli->prepare("SELECT username, points FROM user ORDER BY points DESC LIMIT 10"))) {
@@ -62,8 +86,13 @@ echo "<div><div id='leaderboard' style='display:inline-block;background-color:bl
 	$stmt->bind_result($leadname, $leadpoints);
 	$i = 1; 
 	while ($stmt->fetch()) {
-        echo $i++ .". ". $leadname ."(". $leadpoints .")<br>";
+        echo $i++ .". <a href='players.php?user=". $leadname ."'>". $leadname ."</a> (". $leadpoints .")<br>";
     }
+    
+/*-------------------------------------end leaderboard--------------------------------------*/
+
+/*-------------------------------------list of matches--------------------------------------*/
+    
 echo "</div>
 
 <div id='matches' style='display:inline-block;background-color:black'>stuff to bet on<br>";
@@ -84,6 +113,6 @@ echo "</div>
 
 echo "</div></div>";
 ?>
-
+</div>
 </body>
 </html>
