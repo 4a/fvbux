@@ -1,6 +1,6 @@
 <?php
         include('PHP/TalkPHP_Gravatar.php');
-  $totalpoints = getPoints($_SESSION['name']);	
+	$totalpoints = getPoints($_SESSION['name']);	
 	$Gravatar = new TalkPHP_Gravatar();
 	$Gravatar->setEmail($_SESSION['email']);
 	$Gravatar->setSize(40);
