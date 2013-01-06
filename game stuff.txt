@@ -1,0 +1,31 @@
+<?php
+  // Vars
+  $XBOX = 'AFTERBIRTH WOO';
+  $gamertag = urlencode($XBOX);
+
+  /* 
+    Would be better to use cURL, but for briefness of code, using file_get_contents
+  */
+
+  // Get profile information
+  $profile = json_decode(file_get_contents('http://www.xboxleaders.com/api/profile.json?gamertag='.$gamertag));
+  $profile = $profile->Data;
+echo "XBOX: ". $XBOX ."<br>";  
+echo $profile->IsOnline ? 'Online' : 'Offline';
+echo " | ". $profile->OnlineStatus;
+
+  // Vars
+  $steamid = '76561198000470718';
+
+  /* 
+    Would be better to use cURL, but for briefness of code, using file_get_contents
+  */
+
+  // Get profile information
+  $steamprofile = json_decode(file_get_contents('http://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/?key=F075DDE4CB9FB2F92CF9634B7979CB57&steamids='.$steamid));
+//  print_r($steamprofile);
+  $steamprofile = $steamprofile->response->players[0];
+echo "<br>Steam: ". $steamprofile->personaname."<br>";  
+echo $steamprofile->personastate ? 'Online' : 'Offline';
+echo " | Last Online: ". date('Y-m-d h:i:s',$steamprofile->lastlogoff);
+?>
