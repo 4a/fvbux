@@ -49,10 +49,41 @@ if(isset($_SESSION['loggedin'])) {
 	echo "<a href='signuppage.php'>Register</a><br/>";
 	echo "<a href='signinpage.php'>Log In</a>";
 }
+echo "<div><div id='leaderboard' style='display:inline-block;background-color:black'>leaedr board<br>";
+
+	if(!($stmt = $mysqli->prepare("SELECT username, points FROM user ORDER BY points DESC LIMIT 10"))) {
+		echo "Prepare failed: (" . $mysqli->errno . ") " . $mysqli->error;
+	}
+
+	if (!$stmt->execute()) {
+		echo "Execute failed: (" . $stmt->errno . ") " . $stmt->error;
+	}
+
+	$stmt->bind_result($leadname, $leadpoints);
+	$i = 1; 
+	while ($stmt->fetch()) {
+        echo $i++ .". ". $leadname ."(". $leadpoints .")<br>";
+    }
+echo "</div>
+
+<div id='matches' style='display:inline-block;background-color:black'>stuff to bet on<br>";
+
+	if(!($stmt = $mysqli->prepare("SELECT `ID`, `Input 1`, `Input 2`, `Mod` FROM `bets_matches` ORDER BY `ID` DESC LIMIT 50"))) {
+		echo "Prepare failed: (" . $mysqli->errno . ") " . $mysqli->error;
+	}
+
+	if (!$stmt->execute()) {
+		echo "Execute failed: (" . $stmt->errno . ") " . $stmt->error;
+	}
+
+	$stmt->bind_result($matchNo, $name1, $name2, $mod);
+	$i = 1; 
+	while ($stmt->fetch()) {
+        echo $i++ .". <a href='bets.php?mid=". $matchNo ."'> ". $name1 ." VS. ". $name2 ."</a> [Moderator: ". $mod ."]<br>";
+    }
+
+echo "</div></div>";
 ?>
-
-
-
 
 </body>
 </html>
