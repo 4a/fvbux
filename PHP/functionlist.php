@@ -21,6 +21,14 @@ function updatePoints($winnings, $user) {
 	}
 }
 
+function minusPoints($value, $user) {
+	global $mysqli;
+	if($stmt = $mysqli->prepare("UPDATE user SET points = points - ? WHERE username = ?")) {
+		$stmt->bind_param("is", $value, $user);
+		$stmt->execute();
+	}
+}
+
 function createMatch($input1, $input2, $user, $ip) {
 	global $mysqli;
 	global $newID;
@@ -31,10 +39,11 @@ function createMatch($input1, $input2, $user, $ip) {
 	}
 }
 
-function createBet($match, $user, $value, $ip) {
+function createBet($match, $user, $value, $ip, $private = 0, $user1choice) {
 	global $mysqli;
-	if($stmt = $mysqli->prepare("INSERT INTO bets_money (`match`, `username 1`, `value`, `IP`) VALUES (?, ?, ?, ?)")) {
-		$stmt->bind_param("isii", $match, $user, $value, $ip);
+	$status = "open";
+	if($stmt = $mysqli->prepare("INSERT INTO bets_money (`match`, `username 1`, `value`, `IP`, `status`, `private`, `user1choice`) VALUES (?, ?, ?, ?, ?, ?, ?)")) {
+		$stmt->bind_param("isiisis", $match, $user, $value, $ip, $status, $private, $user1choice);
 		$stmt->execute();
 	}
 	updatePoints($value, $user);
@@ -47,6 +56,22 @@ function challengeBet($match, $user, $ip) {
 		$stmt->execute();
 	}
 	updatePoints($value, $user);
+}
+
+function checkPoints($user, $betamount) {
+	global $mysqli;
+	if($stmt = $mysqli->prepare("SELECT points FROM user WHERE username = ?")) {
+		$stmt->bind_param("s", $user);
+		$stmt->execute();
+		$stmt->bind_result($userpoints);
+		$stmt->fetch();
+		
+		if($userpoints >= $betamount) {
+			return true;
+		} else {
+			return false;
+		}
+	}
 }
 
 /*
