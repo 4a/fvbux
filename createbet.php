@@ -32,13 +32,14 @@ if(array_key_exists('submit',$_POST)) {
 		$errmsg = "You didn't pick a choice to win";
 	}
 	
-	/* TODO: if(!isNumeric($betamount) || empty($betamount)) {
-			$errmsg = "Bet amount entered is not a numeric value or empty";
-		}
-	*/
+	if((!preg_match('/^\d+$/', $betamount)) || empty($betamount)) {
+		$errmsg = "Bet amount entered is not a numeric value or is empty";
+	}
+	
 	if(!isset($errmsg)) {
-		createBet($match_ID, $username, $betamount, $IP, $private, $user1choice);
+		$betID = createBet($match_ID, $username, $betamount, $IP, $private, $user1choice);
 		//create new page (new php page?) so the user can pass around the link and we can link to it publicly
+		header('Location: playerbet.php?bid=' . $betID);
 	}
 }
 
