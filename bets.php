@@ -1,6 +1,9 @@
 <?php
 session_start();
 require('PHP/functionlist.php');
+/*
+	 Need to add if the user has logged in before getting session variables
+*/
 $totalpoints = getPoints($_SESSION['name']);
 $IP = $_SERVER['REMOTE_ADDR'];
 $IP = ip2long($IP);
