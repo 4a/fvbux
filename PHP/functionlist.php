@@ -21,6 +21,14 @@ function updatePoints($winnings, $user) {
 	}
 }
 
+function minusPoints($value, $user) {
+	global $mysqli;
+	if($stmt = $mysqli->prepare("UPDATE user SET points = points - ? WHERE username = ?")) {
+		$stmt->bind_param("is", $value, $user);
+		$stmt->execute();
+	}
+}
+
 function createMatch($input1, $input2, $user, $ip) {
 	global $mysqli;
 	global $newID;
@@ -31,13 +39,17 @@ function createMatch($input1, $input2, $user, $ip) {
 	}
 }
 
-function createBet($match, $user, $value, $ip) {
+function createBet($match, $user, $value, $ip, $private = 0, $user1choice) {
 	global $mysqli;
-	if($stmt = $mysqli->prepare("INSERT INTO bets_money (`match`, `username 1`, `value`, `IP`) VALUES (?, ?, ?, ?)")) {
-		$stmt->bind_param("isii", $match, $user, $value, $ip);
+	$betID;
+	$status = "open";
+	if($stmt = $mysqli->prepare("INSERT INTO bets_money (`match`, `username 1`, `value`, `IP`, `status`, `private`, `user1choice`) VALUES (?, ?, ?, ?, ?, ?, ?)")) {
+		$stmt->bind_param("isiisis", $match, $user, $value, $ip, $status, $private, $user1choice);
 		$stmt->execute();
+		$betID = $stmt->insert_id;
 	}
 	updatePoints($value, $user);
+	return $betID;
 }
 
 function challengeBet($match, $user, $ip) {
@@ -47,6 +59,22 @@ function challengeBet($match, $user, $ip) {
 		$stmt->execute();
 	}
 	updatePoints($value, $user);
+}
+
+function checkPoints($user, $betamount) {
+	global $mysqli;
+	if($stmt = $mysqli->prepare("SELECT points FROM user WHERE username = ?")) {
+		$stmt->bind_param("s", $user);
+		$stmt->execute();
+		$stmt->bind_result($userpoints);
+		$stmt->fetch();
+		
+		if($userpoints >= $betamount) {
+			return true;
+		} else {
+			return false;
+		}
+	}
 }
 
 /*
@@ -90,5 +118,46 @@ class MatchInfo {
 	public function getInput2() { return $this->Input2; }
 	public function getMod() { return $this->Mod; }
 	public function getModIP() { return $this->ModIP; }
+}
+
+class BetInfo {
+
+	private $BetID;
+	private $MatchID;
+	private $User1;
+	private $User2;
+	private $BetValue;
+	private $Odds;
+	private $User1IP;
+	private $Status;
+	private $isPrivate;
+	private $User1Choice;
+	
+	function __construct($betID) {
+		$this->BetID = $betID;
+		$this->getInfo();
+	}
+	
+	private function getInfo() {
+		global $mysqli;
+		if($stmt = $mysqli->prepare("SELECT * FROM bets_money WHERE ID=?")) {
+			$stmt->bind_param("i", $this->BetID);
+			$stmt->execute();
+			$stmt->bind_result($this->BetID, $this->MatchID, $this->User1, $this->User2, $this->BetValue,
+										$this->Odds, $this->User1IP, $this->Status, $this->isPrivate, $this->User1Choice);
+			$stmt->fetch();
+		}
+	}
+	
+	public function getBetID() { return $this->BetID; }
+	public function getMatchID() { return $this->MatchID; }
+	public function getUser1() { return $this->User1; }
+	public function getUser2() { return $this->User2; }
+	public function getBetValue() { return $this->BetValue; }
+	public function getOdds() { return $this->Odds; }
+	public function getUser1IP() { return $this->User1IP; }
+	public function getStatus() { return $this->Status; }
+	public function isPrivate() { return $this->isPrivate; }
+	public function getUser1Choice() { return $this->User1Choice; }
 }
 ?>
