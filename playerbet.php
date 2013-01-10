@@ -3,7 +3,7 @@ session_start();
 require('PHP/functionlist.php');
 
 if(isset($_GET['bid'])) {
-	if(ctype_digit($_GET['bid']) {
+	if(ctype_digit($_GET['bid'])) {
 		$BetInfo = new BetInfo($_GET['bid']);
 		
 	}
