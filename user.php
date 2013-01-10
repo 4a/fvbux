@@ -8,5 +8,4 @@ if(isset($_SESSION['loggedin'])) {
 	$gravurl = $Gravatar->getAvatar();	
 	echo "
         <div id='user'>
-        $_SESSION[level]<br>
-        <img src='$gravurl' alt='Gravatar' /> $_SESSION[name] ($totalpoints) <img src='IS/menu_open.png' /> | <a href='PHP/signout.php'>Log Out</a></div>";}
+        <div id='user-menu'>$_SESSION[name] ($totalpoints) <img src='IS/menu_open.png' /><br>$_SESSION[level]  <a href='PHP/signout.php'>Log Out</a></div> <img id='user-avatar' src='$gravurl' alt='Gravatar' /> </div>";}
