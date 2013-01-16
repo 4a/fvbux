@@ -28,6 +28,12 @@ if(isset($_GET['bid'])) {
                   $user2choice = $input1;
                 }
 
+                if(isset($_SESSION['loggedin'])) {
+                $totalpoints = getPoints($_SESSION['name']);}
+                
+                $IP = $_SERVER['REMOTE_ADDR'];
+                $IP = ip2long($IP);
+
 	}
 
 }
@@ -44,7 +50,7 @@ if(isset($_GET['bid'])) {
 <style>
 body{
   text-align:center;
-}
+}  
 #user
 {
   display:block;
@@ -86,12 +92,60 @@ float:right;
 ?>
 
 <?php
-echo $user1 . " is betting " . $betvalue . " on " . $user1choice . " in the match-up:";
-echo "<h1>" . $input1 . "</h1>";
-echo "<h4>VS</h4>";
-echo "<h1>" . $input2 . "</h1>";
-echo "where the winner is chosen by " . $mod . ".";
-echo "<br>Would you like to bet " . $betvalue . " on " . $user2choice . "?";
+
+if(isset($_SESSION['loggedin']))
+{
+
+if ($status === "open")
+{
+ if (($_SESSION['name'] === $mod) || ($IP === $modip))
+ {
+  echo "You can't bet on match-ups where you are the moderator.";
+ }
+ 
+ else if (($user1 !== $_SESSION['name']) && ($IP === $user1ip)) 
+ {
+  echo "You can't bet against yourself.";
+ }
+
+ else if ($totalpoints < $betvalue)
+ {
+  echo "You are too poor to participate in this bet.";
+ }
+
+ else 
+ {
+ echo $user1 . " is betting " . $betvalue . " on " . $user1choice . " in the match-up:";
+ echo "<h1>" . $input1 . "</h1>";
+ echo "<h4>VS</h4>";
+ echo "<h1>" . $input2 . "</h1>";
+ echo "where the winner is chosen by " . $mod . ".";
+ echo "<br>Would you like to bet " . $betvalue . " on " . $user2choice . "?";
+ }
+}
+
+else if ($status === "locked") 
+{
+  echo "This bet is locked.<br>";
+  echo $user2 . " agreed to bet " . $betvalue . " against " . $user1 . " in the match-up:";
+  echo "<h1>" . $input1 . "</h1>";
+  echo "<h4>VS</h4>";
+  echo "<h1>" . $input2 . "</h1>";
+  echo "where the winner is chosen by " . $mod . "."; 
+}
+
+else
+{
+ echo "This match has ended.";
+}
+
+}
+
+else
+{
+ echo "You have to be logged in.";
+}
+
 ?>
 
 </body>
