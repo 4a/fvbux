@@ -48,17 +48,24 @@ function createBet($match, $user, $value, $ip, $private = 0, $user1choice) {
 		$stmt->execute();
 		$betID = $stmt->insert_id;
 	}
+	$value = $value * -1;
 	updatePoints($value, $user);
 	return $betID;
 }
 
-function challengeBet($match, $user, $ip) {
+function challengeBet($betid, $user, $value) {
 	global $mysqli;
-	if($stmt = $mysqli->prepare("UPDATE bets_money (`match`, `username 1`, `value`, `IP`) VALUES (?, ?, ?, ?)")) {
-		$stmt->bind_param("sii", $user, $ip);
+	$status = "locked";
+	if($stmt = $mysqli->prepare("UPDATE bets_money SET `username 2`=?, `status`=? WHERE (`ID`=? AND `status`='open') ")) {
+		$stmt->bind_param("ssi", $user, $status, $betid);
 		$stmt->execute();
+                $affectedrows = $stmt->affected_rows;
 	}
-	updatePoints($value, $user);
+	if ($affectedrows > 0){
+                $value = $value * -1;
+	        updatePoints($value, $user);
+        }
+	return $status;
 }
 
 function checkPoints($user, $betamount) {
