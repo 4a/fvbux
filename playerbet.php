@@ -2,9 +2,10 @@
 session_start();
 require('PHP/functionlist.php');
 
-if(isset($_GET['bid'])) {
-	if(ctype_digit($_GET['bid'])) {
-		$BetInfo = new BetInfo($_GET['bid']);
+if(isset($_GET['bid']))
+{
+if(ctype_digit($_GET['bid'])) {
+$BetInfo = new BetInfo($_GET['bid']);
                 $betid = $BetInfo->getBetID();
                 $match_ID = $BetInfo->getMatchID();
                 $user1 = $BetInfo->getUser1();
@@ -29,13 +30,20 @@ if(isset($_GET['bid'])) {
                 }
 
                 if(isset($_SESSION['loggedin'])) {
-                $totalpoints = getPoints($_SESSION['name']);}
+                $totalpoints = getPoints($_SESSION['name']);
+                if (empty($user2)) {
+                  $user2 = $_SESSION['name'];}
+                }
                 
                 $IP = $_SERVER['REMOTE_ADDR'];
                 $IP = ip2long($IP);
 
                 $shareurl = "http://".$_SERVER["HTTP_HOST"].$_SERVER["REQUEST_URI"];
-	}
+
+                if(array_key_exists('submit',$_POST)) {
+$status = challengeBet($betid, $user2, $betvalue);
+                }
+}
 
 }
 
@@ -50,14 +58,14 @@ if(isset($_GET['bid'])) {
 <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js" type="text/javascript"></script>
 <style>
 body{
-  text-align:center;
-}  
+text-align:center;
+}
 #user
 {
-  display:block;
-  position:absolute;
-  top:15px;
-  right:30px;
+display:block;
+position:absolute;
+top:15px;
+right:30px;
 }
 
 #user-menu
@@ -76,35 +84,35 @@ float:right;
 
 #fvbux
 {
-  display:block;
-  text-align:center;
+display:block;
+text-align:center;
 }
 #create
 {
-  text-align:center;
+text-align:center;
 }
 </style>
 </head>
 
 <body>
 <?php
-	include 'menu.php';
-	include 'user.php';
+include 'menu.php';
+include 'user.php';
 ?>
 
 <?php
-
+$IPBYPASS = TRUE;
 if(isset($_SESSION['loggedin']))
 {
 
  if ($status === "open")
  {
-  if (($_SESSION['name'] === $mod) || ($IP === $modip))
+  if (($_SESSION['name'] === $mod) || ($IP === $modip && !$IPBYPASS))
   {
    echo "You can't bet on match-ups where you are the moderator.";
   }
 
-  else if (($user1 !== $_SESSION['name']) && ($IP === $user1ip))
+  else if (($user1 !== $_SESSION['name']) && ($IP === $user1ip && !$IPBYPASS))
   {
    echo "You can't bet against yourself.";
   }
@@ -129,6 +137,10 @@ if(isset($_SESSION['loggedin']))
   echo "<h1>" . $input2 . "</h1>";
   echo "where the winner is chosen by " . $mod . ".";
   echo "<br>Would you like to bet " . $betvalue . " on " . $user2choice . "?";
+  echo "
+<form action='$_SERVER[REQUEST_URI]' method='post'>
+<input type='submit' name='submit' value='Place Bet' />
+";
   }
 
  }
