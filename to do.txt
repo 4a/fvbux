@@ -35,11 +35,14 @@ stuff no one challenged shouldnt count.
    from being lame and challenging someone's bet when a match becomes extremely one sided.
    probably need to take advantage of the 'locked' and 'closed' statuses in bets_matches.
 
+
 ---- createbet.php ----
 
 cheating should be prevented if possible
 
 1) *DONE* check if username is the mod name and if ip is the mod ip
+
+2) fix being able to bet more money than you currently have.
 
 
 ---- playerbet.php ----
