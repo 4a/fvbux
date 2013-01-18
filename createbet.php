@@ -96,7 +96,7 @@ echo "<h4>VS</h4>";
 echo "<h1>" . $input2 . "</h1>";
 echo "Moderator : " . $Match->getMod();
 
-if($Match->getMod() != $_SESSION['name']) {
+if($Match->getMod() != $_SESSION['name'] && $IP != $Match->getModIP()) {
 	echo "
 	<br /><br ><br />
 	<form action='$_SERVER[PHP_SELF]?mid=".$match_ID."' method='POST'>
