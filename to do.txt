@@ -31,13 +31,15 @@ mayamayafey (7:04:16 PM): UPDATE user SET points = points + ($betvalue * 2) WHER
 3) pay the moderator some amount based on how many individual bets were completed.
 stuff no one challenged shouldnt count.
 
-
+4) moderator should have some control over when betting can happen. prevent people
+   from being lame and challenging someone's bet when a match becomes extremely one sided.
+   probably need to take advantage of the 'locked' and 'closed' statuses in bets_matches.
 
 ---- createbet.php ----
 
 cheating should be prevented if possible
 
-1) check if username is the mod name and if ip is the mod ip
+1) *DONE* check if username is the mod name and if ip is the mod ip
 
 
 
