@@ -1,14 +1,13 @@
 -- phpMyAdmin SQL Dump
--- version 3.5.2.2
+-- version 3.3.9
 -- http://www.phpmyadmin.net
 --
--- Host: 127.0.0.1
--- Generation Time: Jan 09, 2013 at 06:49 PM
--- Server version: 5.5.27
--- PHP Version: 5.4.7
+-- Host: localhost
+-- Generation Time: Jan 18, 2013 at 02:51 AM
+-- Server version: 5.5.8
+-- PHP Version: 5.3.5
 
 SET SQL_MODE="NO_AUTO_VALUE_ON_ZERO";
-SET time_zone = "+00:00";
 
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
@@ -32,6 +31,8 @@ CREATE TABLE IF NOT EXISTS `bets_matches` (
   `Input 2` varchar(100) NOT NULL,
   `Mod` varchar(16) NOT NULL,
   `IP` int(11) NOT NULL,
+  `status` enum('open','locked','closed') NOT NULL,
+  `winner` varchar(16) NOT NULL,
   PRIMARY KEY (`ID`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=26 ;
 
@@ -39,13 +40,9 @@ CREATE TABLE IF NOT EXISTS `bets_matches` (
 -- Dumping data for table `bets_matches`
 --
 
-INSERT INTO `bets_matches` (`ID`, `Input 1`, `Input 2`, `Mod`, `IP`) VALUES
-(1, 'daygo', 'maygo', 'foray1', 0),
-(22, 'sgs', 'pj', 'foray', 2130706433),
-(23, 'ss', '', 'foray', 2130706433),
-(24, 'sss', '', 'foray', 2130706433),
-(25, 'daigo', 'jwong', 'joe', 2130706433);
-
-/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
-/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
-/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+INSERT INTO `bets_matches` (`ID`, `Input 1`, `Input 2`, `Mod`, `IP`, `status`, `winner`) VALUES
+(1, 'daygo', 'maygo', 'joe', 0, 'open', ''),
+(22, 'sgs', 'pj', 'foray', 2130706433, 'open', ''),
+(23, 'ss', '', 'foray', 2130706433, 'open', ''),
+(24, 'sss', '', 'foray', 2130706433, 'open', ''),
+(25, 'daigo', 'jwong', 'joe', 2130706433, 'open', '');
