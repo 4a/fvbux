@@ -41,7 +41,11 @@ cheating should be prevented if possible
 
 1) *DONE* check if username is the mod name and if ip is the mod ip
 
-2) maybe bet creator can cancel their bet if it's still considered open. not really important.
+
+---- playerbet.php ----
+
+1) maybe bet creator can cancel their bet if it's still considered open. not really important.
+
 
 ---- players.php ----
 
