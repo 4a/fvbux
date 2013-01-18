@@ -52,7 +52,8 @@ consoles?
 fighting games you like playing?
 just rip off eventhubs fight tracker?
 
-
+2) needs a main page when no user profile parameter is set.
+   should show relevant information like matches happening right now or something.
 ---- general ----
 
 1) maybe rename some of the files, we have players, bets, playerbet. its kind of confusing.
