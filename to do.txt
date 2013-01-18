@@ -1,0 +1,63 @@
+these things should happen eventually
+
+---- bets.php - Moderation ----
+
+1) must be able to choose a winner.
+
+2) people who bet on the winner must be paid
+maybe something like:
+
+daigo wins
+
+bets_matches
+set the winner column to 'daigo'
+match status = 'closed'
+
+update bets_money where match = matchid
+
+check bets_money for any rows where 'status' is still 'open'
+set them to 'closed' and refund user1name the bet value
+
+set status where 'locked' to 'closed'
+rows where daigo = user1choice, winner = user1name
+rows where daigo != user1choice, winner = user2name
+
+then update the rows in user
+for each row in bets_money where match = matchid
+add 'value'x2 to rows in user table where 'username'='winner'
+
+mayamayafey (7:04:16 PM): UPDATE user SET points = points + ($betvalue * 2) WHERE username IN (SELECT winner FROM bets_money WHERE match = $matchid)
+
+3) pay the moderator some amount based on how many individual bets were completed.
+stuff no one challenged shouldnt count.
+
+
+
+---- createbet.php ----
+
+cheating should be prevented if possible
+
+1) check if username is the mod name and if ip is the mod ip
+
+
+
+---- players.php ----
+
+1) needs some user specific stuff on profiles:
+
+fvbux
+bet history
+location?
+consoles?
+fighting games you like playing?
+just rip off eventhubs fight tracker?
+
+2) needs a main page when no user profile parameter is set.
+   should show relevant information like matches happening right now or something.
+---- general ----
+
+1) maybe rename some of the files, we have players, bets, playerbet. its kind of confusing.
+
+2) general style changes. rick should probably decide aesthetic.
+
+3) better error messages?
