@@ -96,17 +96,21 @@ echo "<h4>VS</h4>";
 echo "<h1>" . $input2 . "</h1>";
 echo "Moderator : " . $Match->getMod();
 
-echo "
-<br /><br ><br />
-<form action='$_SERVER[PHP_SELF]?mid=".$match_ID."' method='POST'>
-Who to win: <input type='radio' name='winner' value='".$input1."'>".$input1."
-&nbsp;<input type='radio' name='winner' value='".$input2."'>".$input2."<br />
-Bet Amount: <input type='text' name='betamount'><br />
-Private?: <input type='checkbox' name='private'><br/>
-<input type='submit' name='submit'>
-<br />
-(Note: Private only means that your bet wont show publicly on the website.)<br />
-</form>";
+if($Match->getMod() != $_SESSION['name']) {
+	echo "
+	<br /><br ><br />
+	<form action='$_SERVER[PHP_SELF]?mid=".$match_ID."' method='POST'>
+	Who to win: <input type='radio' name='winner' value='".$input1."'>".$input1."
+	&nbsp;<input type='radio' name='winner' value='".$input2."'>".$input2."<br />
+	Bet Amount: <input type='text' name='betamount'><br />
+	Private?: <input type='checkbox' name='private'><br/>
+	<input type='submit' name='submit'>
+	<br />
+	(Note: Private only means that your bet wont show publicly on the website.)<br />
+	</form>";
+} else {
+	echo "<br /> <br />You are the moderator ya cunt";
+}
 ?>
 
 </body>
