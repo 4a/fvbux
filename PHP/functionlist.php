@@ -145,6 +145,7 @@ class BetInfo {
 	private $Status;
 	private $isPrivate;
 	private $User1Choice;
+	private $BetWinner;
 	
 	function __construct($betID) {
 		$this->BetID = $betID;
@@ -157,7 +158,7 @@ class BetInfo {
 			$stmt->bind_param("i", $this->BetID);
 			$stmt->execute();
 			$stmt->bind_result($this->BetID, $this->MatchID, $this->User1, $this->User2, $this->BetValue,
-										$this->Odds, $this->User1IP, $this->Status, $this->isPrivate, $this->User1Choice);
+										$this->Odds, $this->User1IP, $this->Status, $this->isPrivate, $this->User1Choice, $this->BetWinner);
 			$stmt->fetch();
 		}
 	}
@@ -172,5 +173,6 @@ class BetInfo {
 	public function getStatus() { return $this->Status; }
 	public function isPrivate() { return $this->isPrivate; }
 	public function getUser1Choice() { return $this->User1Choice; }
+	public function getBetWinner() { return $this->BetWinner; }
 }
 ?>
