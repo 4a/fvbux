@@ -71,7 +71,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST') {
                                 }
 			}
 			/* Updating bets_money:
-				Changing the status column to locked in rows with the right match id
+				Changing the status column to closed in rows with the right match id
 			*/
 			if($stmt = $mysqli->prepare("UPDATE `bets_money` SET `status`='closed' WHERE `match`=?")) {
 				$stmt->bind_param("i", $_POST['matchid']);
