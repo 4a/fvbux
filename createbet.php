@@ -20,11 +20,14 @@ TODO:
 3. create a GET filled link that they can give to other people
 */
 
+$IP = $_SERVER['REMOTE_ADDR'];
+$IP = ip2long($IP);
+$IPBYPASS = FALSE;
+
 if(array_key_exists('submit',$_POST)) {
 	$username = $_SESSION['name'];
+	$totalpoints = getpoints($username);
 	$betamount = $_POST['betamount'];
-	$IP = $_SERVER['REMOTE_ADDR'];
-	$IP = ip2long($IP);
 	$private = isset($_POST['private']) ? 1 : 0;
 	if(isset($_POST['winner'])) {
 		$user1choice = $_POST['winner'];
@@ -36,6 +39,10 @@ if(array_key_exists('submit',$_POST)) {
 		$errmsg = "Bet amount entered is not a numeric value or is empty";
 	}
 	
+	if($betamount > $totalpoints) {
+		$errmsg = "You're too poor to do that.";
+	}
+
 	if(!isset($errmsg)) {
 		$betID = createBet($match_ID, $username, $betamount, $IP, $private, $user1choice);
 		//create new page (new php page?) so the user can pass around the link and we can link to it publicly
@@ -96,7 +103,7 @@ echo "<h4>VS</h4>";
 echo "<h1>" . $input2 . "</h1>";
 echo "Moderator : " . $Match->getMod();
 
-if($Match->getMod() != $_SESSION['name'] && $IP != $Match->getModIP()) {
+if($Match->getMod() != $_SESSION['name'] && $IP != $Match->getModIP() || $IPBYPASS) {
 	echo "
 	<br /><br ><br />
 	<form action='$_SERVER[PHP_SELF]?mid=".$match_ID."' method='POST'>
