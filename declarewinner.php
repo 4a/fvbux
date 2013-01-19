@@ -38,7 +38,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST') {
                                 	$stmt->execute();
                                 }
 			}
-			/* Updating bets_money:
+			/* Updating bets_money: 
 				Changing the winner column to username 1 where user1choice is the winner
 			*/
 			if($stmt = $mysqli->prepare("UPDATE bets_money SET `winner`=`username 1` WHERE (`user1choice`=? AND `match`=? AND `status`='locked')")) {
