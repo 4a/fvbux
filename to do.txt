@@ -1,5 +1,9 @@
 these things should happen eventually
 
+---- in general ----
+
+1) Need to change HTML/CSS where the match names show (no <h1>) so things can be placed next to it
+
 ---- bets.php - Moderation ----
 
 1) must be able to choose a winner.

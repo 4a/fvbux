@@ -84,9 +84,19 @@ if(isset($_SESSION['loggedin']))
   {
    if ($_SESSION['name'] === $mod)
    {
-   echo "<h1>" . $input1 . "</h1>";
+   echo "<h1>" . $input1 . "</h1> 
+	<form action='declarewinner.php' method='POST'>
+	<input type='hidden' name='matchid' value='" . $match_ID . "'>
+	<input type='hidden' name='winner' value='" . $input1 . "'>
+	<input type='image' src='IS/tick.png' name='submit'>
+	</form>";
    echo "<h4>VS</h4>";
-   echo "<h1>" . $input2 . "</h1>";
+   echo "<h1>" . $input2 . "</h1> 
+   <form action='declarewinner.php' method='POST'>
+	<input type='hidden' name='matchid' value='" . $match_ID . "'>
+	<input type='hidden' name='winner' value='" . $input2 . "'>
+	<input type='image' src='IS/tick.png' name='submit'>
+	</form>";
    echo "You are the moderator";
    }
    else if ($IP == $modip and !$IPBYPASS) 
