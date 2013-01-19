@@ -24,6 +24,8 @@ $IP = $_SERVER['REMOTE_ADDR'];
 $IP = ip2long($IP);
 $IPBYPASS = FALSE;
 
+
+/* Check if form has been submitted */
 if(array_key_exists('submit',$_POST)) {
 	$username = $_SESSION['name'];
 	$totalpoints = getpoints($username);

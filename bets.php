@@ -241,6 +241,7 @@ if(isset($_SESSION['loggedin'])) {
 		<input type='text' name='input2'><br>
 		<input type='submit' name='submit' value='Submit' />";
 	}
+
 }
 
 /* User is not signed in */

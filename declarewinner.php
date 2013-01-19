@@ -93,3 +93,4 @@ header('Location:bets.php?mid='.$_POST['matchid']);
 }
 
 ?>
+
