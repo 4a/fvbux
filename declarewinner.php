@@ -24,7 +24,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST') {
 				Select betvalues and names from open bets in bets_money
 				Refund betvalues to usernames in user
 			*/
-			if($stmt = $mysqli->prepare("SELECT `value`, `username 1` FROM bets_money WHERE (`match`=? AND `status`='open'")) {
+			if($stmt = $mysqli->prepare("SELECT `value`, `username 1` FROM bets_money WHERE (`match`=? AND `username 2`=''")) {
 				$stmt->bind_param("i", $_POST['matchid']);
 				$stmt->execute();
 				$results = Array();
@@ -56,7 +56,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST') {
 				Select betvalues and names from winner column in bets_money
 				Pay betvalues x2 to usernames in user
 			*/
-			if($stmt = $mysqli->prepare("SELECT `value`, `winner` FROM bets_money WHERE (`match`=? AND `username 2`=''")) {
+			if($stmt = $mysqli->prepare("SELECT `value`, `winner` FROM bets_money WHERE (`match`=? AND NOT `username 2`=''")) {
 				$stmt->bind_param("i", $_POST['matchid']);
 				$stmt->execute();
 				$results = Array();
@@ -71,7 +71,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST') {
                                 }
 			}
 			/* Updating bets_money:
-				Changing the status column to closed in rows with the right match id
+				Changing the status column to locked in rows with the right match id
 			*/
 			if($stmt = $mysqli->prepare("UPDATE `bets_money` SET `status`='closed' WHERE `match`=?")) {
 				$stmt->bind_param("i", $_POST['matchid']);
