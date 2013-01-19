@@ -31,12 +31,13 @@ function minusPoints($value, $user) {
 
 function createMatch($input1, $input2, $user, $ip) {
 	global $mysqli;
-	global $newID;
+	$matchID;
 	if($stmt = $mysqli->prepare("INSERT INTO bets_matches (`Input 1`, `Input 2`, `Mod`, `IP`) VALUES (?, ?, ?, ?)")) {
 		$stmt->bind_param("sssi", $input1, $input2, $user, $ip);
 		$stmt->execute();
-		$newID = $stmt->insert_id;
+		$matchID = $stmt->insert_id;
 	}
+	return $matchID;
 }
 
 function createBet($match, $user, $value, $ip, $private = 0, $user1choice) {
