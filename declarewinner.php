@@ -24,7 +24,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST') {
 				Select betvalues and names from open bets in bets_money
 				Refund betvalues to usernames in user
 			*/
-			if($stmt = $mysqli->prepare("SELECT `value`, `username 1` FROM bets_money WHERE (`match`=? AND `username 2`=''")) {
+			if($stmt = $mysqli->prepare("SELECT `value`, `username 1` FROM bets_money WHERE (`match`=? AND `username 2`='')")) {
 				$stmt->bind_param("i", $_POST['matchid']);
 				$stmt->execute();
 				$results = Array();
@@ -38,7 +38,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST') {
                                 	$stmt->execute();
                                 }
 			}
-			/* Updating bets_money: 
+			/* Updating bets_money:
 				Changing the winner column to username 1 where user1choice is the winner
 			*/
 			if($stmt = $mysqli->prepare("UPDATE bets_money SET `winner`=`username 1` WHERE (`user1choice`=? AND `match`=? AND `status`='locked')")) {
@@ -56,7 +56,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST') {
 				Select betvalues and names from winner column in bets_money
 				Pay betvalues x2 to usernames in user
 			*/
-			if($stmt = $mysqli->prepare("SELECT `value`, `winner` FROM bets_money WHERE (`match`=? AND NOT `username 2`=''")) {
+			if($stmt = $mysqli->prepare("SELECT `value`, `winner` FROM bets_money WHERE `match`=? AND NOT `username 2`=''")) {
 				$stmt->bind_param("i", $_POST['matchid']);
 				$stmt->execute();
 				$results = Array();
