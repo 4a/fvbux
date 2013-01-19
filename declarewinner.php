@@ -15,7 +15,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST') {
 				Changing the winner column and the status column
 			*/
 			global $mysqli;
-			if($stmt = $mysqli->prepare("UPDATE bets_matches SET winner=?, status='closed' WHERE ID=?") {
+			if($stmt = $mysqli->prepare("UPDATE bets_matches SET winner=?, status='closed' WHERE ID=?")) {
 				$stmt->bind_param("si", $_POST['winner'], $_POST['matchid']);
 				$stmt->execute();
 			}
