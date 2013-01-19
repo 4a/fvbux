@@ -286,21 +286,32 @@ if(isset($_GET['user']) and !empty($_GET['user']))
        ";
              
   echo "<div id='content-bottom'>";
-  echo "
-        <div id='tab1'>
-        <p>
-        Open Bets:
-       ";
+
+  echo "<div id='tab1'><p>";
   $stmt = $mysqli->prepare("SELECT `ID`, `value`, `user1choice` FROM `bets_money` WHERE (`username 1`=? AND `status`='open' AND `private`=0) ");
   $stmt->bind_param("s", $username);
   $stmt->execute();
   $stmt->bind_result($betNo, $betvalue, $user1choice);
+
+  echo "Bet against me!";
   while ($stmt->fetch())
   {
-   echo "<br><a href='playerbet.php?bid=" . $betNo . "'>" . $betvalue . " FVbux on " . $user1choice . "</a>";
+   echo "<br><a href='playerbet.php?bid=" . $betNo . "'>I'm betting " . $betvalue . " FVbux on " . $user1choice . "</a>";
   }
-  
 
+  echo "</p>";
+
+  echo "<p>
+        History:
+       ";
+  $stmt = $mysqli->prepare("SELECT `value` FROM `bets_money` WHERE (`winner`=?) ");
+  $stmt->bind_param("s", $username);
+  $stmt->execute();
+  $stmt->bind_result($winnings);
+  while ($stmt->fetch())
+  {
+   echo "<br>I won " . $winnings . " FVbux";
+  }
 
   echo "</p>";
 
