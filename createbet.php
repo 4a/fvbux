@@ -22,7 +22,7 @@ TODO:
 
 $IP = $_SERVER['REMOTE_ADDR'];
 $IP = ip2long($IP);
-$IPBYPASS = FALSE;
+$IPBYPASS = TRUE;
 
 
 /* Check if form has been submitted */
