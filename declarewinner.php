@@ -30,12 +30,13 @@ if($_SERVER['REQUEST_METHOD'] == 'POST') {
 				$results = Array();
 				$stmt->bind_result($betvalues, $winners);
                                 while( $stmt->fetch() ) {
-                                	$results[$winners] = $betvalues;
+                                	$results[] = array( winner => $winners, betvalue => $betvalues);
                                 }
-                                foreach ($results as $winner => $betvalue) {
+                                foreach ($results as $result) {
                                 	if($stmt = $mysqli->prepare("UPDATE user SET points = points + ? WHERE username=?")) {
-                                	$stmt->bind_param("is", $betvalue, $winner);
+                                	$stmt->bind_param("is", $result['betvalue'], $result['winner']);
                                 	$stmt->execute();
+                                	//echo "<br>Refunded ". ($result['betvalue']) ." to ". $result['winner'] ."'s points.";
                                 	}
                                 }
 			}
@@ -64,14 +65,17 @@ if($_SERVER['REQUEST_METHOD'] == 'POST') {
 				$results = Array();
 				$stmt->bind_result($betvalues, $winners);
                                 while( $stmt->fetch() ) {
-                                	$results[$winners] = $betvalues;
+                                	$results[] = array( winner => $winners, betvalue => $betvalues);
                                 }
-                                foreach ($results as $winner => $betvalue) {
+
+                                foreach ($results as $result) {
                                 	if($stmt = $mysqli->prepare("UPDATE user SET points = points + (? * 2) WHERE username=?")) {
-                                	$stmt->bind_param("is", $betvalue, $winner);
+                                	$stmt->bind_param("is", $result['betvalue'], $result['winner']);
                                 	$stmt->execute();
+                                	//echo "<br>Added ". ($result['betvalue'] * 2) ." to ". $result['winner'] ."'s points.";
                                         }
                                 }
+
                                 $modcut = (count($results) * 10);
                                 if($stmt = $mysqli->prepare("UPDATE user SET points = points + ? WHERE username=?")) {
                                	$stmt->bind_param("is", $modcut, $mod);
@@ -93,4 +97,3 @@ header('Location:bets.php?mid='.$_POST['matchid']);
 }
 
 ?>
-
