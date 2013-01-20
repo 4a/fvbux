@@ -122,6 +122,11 @@ if(isset($_SESSION['loggedin']))
    echo "You have bet " . $betvalue . " on " . $user1choice;
    echo "<br>No one has bet against you yet.<br>";
    echo "Share URL: <input name='share_url' value='" . $shareurl . "'>";
+   echo "<br /><br /><form action='cancelbet.php' method='POST'>
+			<input type='hidden' name='betid' value='" . $_GET['bid'] . "'>
+			<input type='image' src='IS/tick.png' name='submit'>
+			</form>";
+	echo "<br />(REPLACE TICK WITH PROPER 'CANCEL BET' IMAGE OR SOMETHING)";
   }
 
   else if ($totalpoints < $betvalue)
