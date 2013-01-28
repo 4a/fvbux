@@ -13,6 +13,22 @@ function getPoints($user) {
 	}
 }
 
+function doesUserExist($username) {
+	global $mysqli;
+	if($stmt = $mysqli->prepare("SELECT username FROM user WHERE username = ?")) {
+		$stmt->bind_param("s", $username);
+		$stmt->execute();
+		$stmt->bind_result($user);
+		$stmt->fetch();
+		
+		if(isset($user)) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+}
+
 function updatePoints($winnings, $user) {
 	global $mysqli;
 	if($stmt = $mysqli->prepare("UPDATE user SET points = points + ? WHERE username = ?")) {
