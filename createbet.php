@@ -22,10 +22,8 @@ TODO:
 
 $IP = $_SERVER['REMOTE_ADDR'];
 $IP = ip2long($IP);
-$IPBYPASS = TRUE;
+$IPBYPASS = FALSE;
 
-
-/* Check if form has been submitted */
 if(array_key_exists('submit',$_POST)) {
 	$username = $_SESSION['name'];
 	$totalpoints = getpoints($username);
@@ -61,26 +59,10 @@ if(array_key_exists('submit',$_POST)) {
 <title>Fightan' /v/idya</title>
 <link rel="shortcut icon" href="FV.ico" >
 <link rel="stylesheet" type="text/css" href="CSS/newfightans.css">
+<link rel="stylesheet" type="text/css" href="CSS/tempstyles.css">
 <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js" type="text/javascript"></script>
 <style>
 body
-{
-  text-align:center;
-}
-
-#user
-{
-  display:block;
-  position:fixed;
-  top:15px;
-  right:30px;
-}
-#fvbux
-{
-  display:block;
-  text-align:center;
-}
-#create
 {
   text-align:center;
 }
