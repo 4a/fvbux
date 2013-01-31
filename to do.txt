@@ -1,9 +1,5 @@
 these things should happen eventually
 
----- in general ----
-
-1) Need to change HTML/CSS where the match names show (no <h1>) so things can be placed next to it
-
 ---- bets.php - Moderation ----
 
 1)*DONE*  must be able to choose a winner.
@@ -74,3 +70,12 @@ just rip off eventhubs fight tracker?
 2) general style changes. rick should probably decide aesthetic.
 
 3) better error messages?
+
+4) Need to change HTML/CSS where the match names show (no <h1>) so things can be placed next to it
+(maybe this gets changed when we are working on the overall design aesthetic)
+
+5) Match/Bet logs: 
+  - need to limit it somehow; cant really show their whole history on one page
+  - seperate into a multi-page thing?
+  
+6) FAQ/Help page?
