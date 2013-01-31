@@ -5,7 +5,7 @@ require('PHP/functionlist.php');
 $IP = $_SERVER['REMOTE_ADDR'];
 $IP = ip2long($IP);
 /* $IPBYPASS is used to get around the ip check so you are able to test bet creation locally */
-$IPBYPASS = TRUE;
+$IPBYPASS = FALSE;
 
 if(isset($_SESSION['loggedin'])) {
 	$totalpoints = getPoints($_SESSION['name']);
@@ -36,43 +36,13 @@ if(array_key_exists('submit',$_POST)) {
 <title>Fightan' /v/idya</title>
 <link rel="shortcut icon" href="FV.ico" >
 <link rel="stylesheet" type="text/css" href="CSS/newfightans.css">
+<link rel="stylesheet" type="text/css" href="CSS/tempstyles.css">
 <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js" type="text/javascript"></script>
 <style>
 body
 {
   text-align:center;
 }  
-#user
-{
-  display:block;
-  position:absolute;
-  top:15px;
-  right:30px;
-}
-
-#user-menu
-{
-float:left;
-display:inline-block;
-margin-right: 10px;
-text-align:right;
-}
-
-#user-avatar
-{
-display:block;
-float:right;
-}
-
-#fvbux
-{
-  display:block;
-  text-align:center;
-}
-#create
-{
-  text-align:center;
-}
 </style>
 </head>
 <body>
@@ -205,7 +175,7 @@ if(isset($_SESSION['loggedin'])) {
 				echo "<h1>" . $matchloser . "</h1>";
 				/* Begin list of winners */
 					echo "<br><br><div id='open_bets'>Winners:<br>";
-					$stmt = $mysqli->prepare("SELECT `winner`, `value` FROM `bets_money` WHERE (`match`=?) ORDER BY value DESC");
+					$stmt = $mysqli->prepare("SELECT `winner`, `value` FROM `bets_money` WHERE `match`=? AND NOT `username 2`='' ORDER BY value DESC");
 					$stmt->bind_param("s", $match_ID);
 					$stmt->execute();
 					$stmt->bind_result($winner, $winnings);
@@ -241,7 +211,6 @@ if(isset($_SESSION['loggedin'])) {
 		<input type='text' name='input2'><br>
 		<input type='submit' name='submit' value='Submit' />";
 	}
-
 }
 
 /* User is not signed in */
