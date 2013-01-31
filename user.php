@@ -6,6 +6,35 @@ if(isset($_SESSION['loggedin'])) {
 	$Gravatar->setEmail($_SESSION['email']);
 	$Gravatar->setSize(40);
 	$gravurl = $Gravatar->getAvatar();	
+
 	echo "
         <div id='user'>
-        <div id='user-menu'>$_SESSION[name] ($totalpoints) <img src='IS/menu_open.png' /><br>$_SESSION[level]  <a href='PHP/signout.php'>Log Out</a></div> <img id='user-avatar' src='$gravurl' alt='Gravatar' /> </div>";}
+        <div id='user-menu'>
+	<span>". $_SESSION[name] ."<img src='IS/menu_open.png' /></span>
+        	<div class='user-dropdown' style='display:none'>";
+        if ($_SESSION[level] === "admin") {
+        echo "<div><a href='adminpanel.php'>Admin Panel</a></div>";}
+        echo " 
+        	<div><a href='PHP/signout.php'>Log Out</a></div>
+        	</div>
+        <br>$". $totalpoints ."&nbsp;	
+        </div>	
+        <a href='players.php?user=". $_SESSION[name] ."'><img id='user-avatar' src='$gravurl' alt='Gravatar' /></a>
+        </div>";
+        
+        echo "
+	<script type='text/javascript'>
+	$(document).ready(function () {
+	$('#user-menu span').click(function () {
+	//alert('test');
+	$('.user-dropdown').toggle();
+	});
+	});
+	</script>";
+
+        } else {
+        echo "
+        <div id='user'>
+        <div id='user-menu'><a href='signinpage.php'>Log In</a></div>
+        </div>";
+        }   
