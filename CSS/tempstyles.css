@@ -1,0 +1,235 @@
+/* This file was made to have style consistency between the new pages. The shared elements like the user login thing should look the same accross pages now. All pages (players, bets, createbet, playerbet, adminpanel) styles were replaced with this file except on some pages (bets, playerbet, createbet) there was a body {text-align:center} property to center the text. I left these in for appearances but these pages should be changed so that the text that needs to be centered is inside some element rather than just sitting in the body and the body styles should be removed. */
+
+/* this was only in adminpanel.php. could be applied to other pages with error messages later */
+#error
+{
+  color: red;
+}
+
+/* ------- Begin top right user dropdown thing ------------- */
+/* this is the div that contains the login link, user dropdown and avatar */
+#user
+{
+  display:block;
+  position:absolute;
+  top:15px;
+  right:30px;
+  line-height:22px;
+  z-index:999999999;
+}
+
+/* this is the clicky part. your username and your total fvbux are inside this */
+#user-menu
+{
+float:left;
+display:inline-block;
+margin-right: 10px;
+text-align:right;
+position:relative;
+}
+
+/* this is the dropdown menu that appears after clicking your name. logout link etc. */
+.user-dropdown
+{
+position:absolute;
+background:black;
+width:200px;
+text-align:left;
+right:0px;
+}
+
+/* your avatar */
+#user-avatar
+{
+display:block;
+float:right;
+}
+/* ---------------- end user dropdown ----------------- */
+
+
+/* ------------- Begin user profiles ----------------------*/
+/* All of this stuff for user profiles was mostly just experimenting with layout designs and should probably be dumped for something more sane */
+
+/* container for the content on players.php. shares an id with an element in newfightans.css so it may need to be renamed later */
+#mainbox
+{
+max-width:100%;
+min-width:777px;
+margin-top:30px;
+overflow:visible;
+}
+
+/* username of current user profile */
+#content-title
+{
+text-align:left;
+color:#fff;
+font-family: Trebuchet, arial, sans-serif;
+font-size: 25px;
+font-weight: normal;
+text-shadow: #388CC8 1px 1px 2px;
+letter-spacing: .025em;
+line-height: 30px;
+margin-left: 5px;
+padding: 0;
+max-width:200px;
+}
+
+/* this is content on the left of user profiles. currently only an avatar is here */ 
+#content-left
+{
+position:absolute;
+top:-29px;
+left:0px;
+z-index:10;
+}
+
+/* this is the user profile avatar's border. it's a div in case we wanna have one of those fancy floating borders */
+#avatar-border
+{
+width:202px;
+height:202px;
+border:3px solid #2F2F88;
+text-align: center;
+margin: auto;
+border-radius: 5px;
+background: #2F2F88;
+box-shadow: .2em .2em .3em rgba( 0, 0, 0, 0.45 );
+}
+
+/* the avatar image for user profiles */
+#avatar-border img
+{
+margin: 1px;
+border-radius: 5px;
+}
+
+/* this is the middle of profiles. currently used for the bio section */
+#content-center
+{
+position:relative;
+top:-3px;
+/*max-width:595px;   */
+max-width:695px;
+min-width:383px;
+min-height:170px;
+left:0px;
+margin-right:270px;
+background:#11183F;
+border-radius: 10px;
+box-shadow: .2em .2em .3em rgba( 0, 0, 0, 0.45 );
+z-index:0;
+}
+
+/* i dont remember why this has its own id */
+#bio
+{
+display:inline-block;
+position:relative;
+left:168px;
+}
+
+/* these usual classes are for the tabs like "bio, bets, games" */
+.usual li {
+list-style: none;
+float: left;
+text-shadow: black 1px 1px 2px;
+}
+
+.usual ul a {
+display: block;
+padding: 6px 10px;
+text-decoration: none!important;
+margin-right: 5px;
+margin-left: 0;
+font: 10px Trebuchet, arial, sans-serif;
+line-height:10px;
+color: white;
+background: transparent;
+
+}
+
+.usual ul a:hover {
+
+  color: #FFF;
+background: #11183F;
+border-bottom: 1px solid #11183F;
+margin-bottom: 0;
+border-top-right-radius:5px;
+border-top-left-radius:5px;
+  }
+
+.usual ul a.selected {
+margin-bottom: 0;
+  color:#FFF;
+/*  background:#2F2F88; */
+  background:#11183F;
+border-bottom: 1px solid #11183F;
+cursor: default;
+border-top-right-radius:5px;
+border-top-left-radius:5px;
+}
+
+/* just used for quick margins for words inside boxes */
+p
+{
+padding:10px;
+margin:0px;
+}
+
+/* right side of user profiles. has the leaderboard and current bet stuff right now. maybe it should be something else */
+#content-right
+{
+float:right;
+position:absolute;
+top:0px;
+right:0px;
+max-width:255px;
+}
+
+/* these are the tabs above the bottom content "bets, games" */
+#tabs
+{
+display:inline-block;
+position:relative;
+left:-40px;
+top:13px;
+}
+
+/*  this is the content at the bottom */
+#content-bottom
+{
+  margin-top:10px;
+  max-width:695px;
+  min-width:383px;
+  min-height:270px;
+  left:0px;
+  margin-right:270px;
+  background:#11183F;
+  border-radius: 10px;
+  border-top-left-radius:0px;
+  box-shadow: .2em .2em .3em rgba( 0, 0, 0, 0.45 );
+}
+/*----------- end of user profile things --------------------------*/
+
+/* ---------- little widget-like things with info about cool stuff -------------- */
+#leaderboard
+{
+position:relative;
+width:255px;
+display:inline-block;
+background: rgba(0, 0, 0, 0.6);
+border-radius: 10px;
+border:5px solid #000;
+}
+
+#matches
+{
+position:relative;
+width:255px;
+display:inline-block;
+background: rgba(0, 0, 0, 0.6);
+border-radius: 10px;
+margin:20px 0px 0px 0px;
+border:5px solid #000;
+}
