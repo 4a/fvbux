@@ -49,23 +49,10 @@ if($_SERVER['REQUEST_METHOD'] == 'POST') {
 <title>Fightan' /v/idya</title>
 <link rel="shortcut icon" href="FV.ico" >
 <link rel="stylesheet" type="text/css" href="CSS/newfightans.css">
+<link rel="stylesheet" type="text/css" href="CSS/tempstyles.css">
 <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js" type="text/javascript"></script>
 <script type="text/javascript" src="JS/idtabs.js"></script>
-<style>
-#user
-{
-  display:block;
-  position:absolute;
-  top:15px;
-  right:30px;
-  line-height:22px;
-}
 
-#error
-{
-	color: red;
-}
-</style>
 </head>
 
 <body>
