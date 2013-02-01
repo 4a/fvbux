@@ -10,7 +10,6 @@ if(isset($_SESSION['loggedin'])) {
 	echo "
         <div id='user'>
         <div id='user-menu'>
-<<<<<<< HEAD
 	<span>". $_SESSION['name'] ."<img src='IS/menu_open.png' /></span>
         	<div class='user-dropdown' style='display:none'>";
         if ($_SESSION['level'] === "admin") {
