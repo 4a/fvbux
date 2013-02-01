@@ -10,16 +10,17 @@ if(isset($_SESSION['loggedin'])) {
 	echo "
         <div id='user'>
         <div id='user-menu'>
-	<span>". $_SESSION[name] ."<img src='IS/menu_open.png' /></span>
+<<<<<<< HEAD
+	<span>". $_SESSION['name'] ."<img src='IS/menu_open.png' /></span>
         	<div class='user-dropdown' style='display:none'>";
-        if ($_SESSION[level] === "admin") {
+        if ($_SESSION['level'] === "admin") {
         echo "<div><a href='adminpanel.php'>Admin Panel</a></div>";}
         echo " 
         	<div><a href='PHP/signout.php'>Log Out</a></div>
         	</div>
         <br>$". $totalpoints ."&nbsp;	
         </div>	
-        <a href='players.php?user=". $_SESSION[name] ."'><img id='user-avatar' src='$gravurl' alt='Gravatar' /></a>
+        <a href='players.php?user=". $_SESSION['name'] ."'><img id='user-avatar' src='$gravurl' alt='Gravatar' /></a>
         </div>";
         
         echo "

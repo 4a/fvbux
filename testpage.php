@@ -44,7 +44,7 @@ require('PHP/functionlist.php');
  -webkit-transition: all 300ms ease-out;
 }
 
-.match
+.matchContainer
 {
  width:50%;
  min-height:100%;
@@ -63,6 +63,20 @@ require('PHP/functionlist.php');
  padding: 4px 4px 4px 4px;
 }
 
+.match
+{
+	width:50%;
+	float:left;
+}
+
+/* since the widths of these divs is 50% adding a border between the match div and the info div will create a line break. if you want a border it would be better to set the widths to a pixel value that is half of the width of the container minus the width of the border you want. */
+
+.matchInfo
+{
+	width:50%;
+	float:right;
+}
+	
 .match img {
  float: left;
  width: 45px;
@@ -71,6 +85,7 @@ require('PHP/functionlist.php');
 }
 
 .match .eventName
+>>>>>>> upstream/master
 {
 }
 
