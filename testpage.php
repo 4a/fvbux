@@ -34,7 +34,7 @@ require('PHP/functionlist.php');
  width: 100%;
  background-color: white;
  border-style: solid;
- border-width: 1px;
+ border-width: 3px;
  border-color: grey;
  color: black;
  overflow:hidden;
@@ -59,7 +59,7 @@ require('PHP/functionlist.php');
  width:50%;
  min-height:100%;
  margin-left: 50%;
- border-left: solid 2px grey;
+ border-left: solid 1px grey;
  padding: 4px 4px 4px 4px;
 }
 
