@@ -85,7 +85,6 @@ require('PHP/functionlist.php');
 }
 
 .match .eventName
->>>>>>> upstream/master
 {
 }
 
