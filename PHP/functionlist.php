@@ -192,4 +192,37 @@ class BetInfo {
 	public function getUser1Choice() { return $this->User1Choice; }
 	public function getBetWinner() { return $this->BetWinner; }
 }
+
+class UserInfo {
+	
+	private $UserID;
+	private $Username;
+	private $Password;
+	private $Points;
+	private $Email;
+	private $AccountLevel;
+	
+		function __construct($username) {
+		$this->Username = $username;
+		$this->getInfo();
+	}
+	
+	private function getInfo() {
+		global $mysqli;
+		if($stmt = $mysqli->prepare("SELECT * FROM user WHERE username=?")) {
+			$stmt->bind_param("s", $this->Username);
+			$stmt->execute();
+			$stmt->bind_result($this->UserID, $this->Username, $this->Password, $this->Points, $this->Email,
+										$this->AccountLevel);
+			$stmt->fetch();
+		}
+	}
+	
+	public function getUserID() { return $this->UserID; }
+	public function getUsername() { return $this->Username; }
+	public function getPassword() { return $this->Password; }
+	public function getPoints() { return $this->Points; }
+	public function getEmail() { return $this->Email; }
+	public function getAccountLevel() { return $this->AccountLevel; }
+}
 ?>
