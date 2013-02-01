@@ -1,5 +1,6 @@
 <?php
 session_start();
+require('PHP/connect.php');
 require('PHP/functionlist.php');
 ?>
 <!DOCTYPE HTML>
@@ -95,11 +96,45 @@ $MatchImage = new TalkPHP_Gravatar();
 $MatchImage->setEmail($_SESSION['email']);
 $MatchImage->setSize(45);
 $imgURL = $MatchImage->getAvatar();
+
 ?>
+<div id='matchesBox'>
+<?php
+if($stmt = $mysqli->prepare("SELECT `ID`, `Input 1`, `Input 2`, `Mod` FROM `bets_matches` ORDER BY `ID` DESC LIMIT 10")) {
+	$stmt->execute();
+	$stmt->bind_result($matchNo, $name1, $name2, $mod);
+
+	while($stmt->fetch()) {
+		/* Need the user meta table and link the <img> tag to their avatar 
+			And also fill in the missing info when the sql tables are updated with it*/
+	
+		echo "
+		<a href='bets.php?" . $matchNo . "'>
+		<div class='matchContainer'>
+			<div class='match'>
+			<img src='" . $imgURL . "' alt='pic' >
+			<div>Event Name Here</div>
+			<div>" . $name1 . " vs " . $name2 . "</div>
+			</div>
+			
+			<div class='matchInfo'>
+			<div>Mod: ". $mod . "</div>
+			<div>Info: Info Goes Here</div>
+			</div>
+		</div>
+		</a>";
+		
+	}
+
+}
+?>
+</div>
+
+<!--
 <div id='matchesBox'>
 	<div class='matchContainer'>
 		<div class='match'>
-		<img src='<?php echo $imgURL; ?>' alt='pic' >
+		<img src='<?//php echo $imgURL; ?>' alt='pic' >
 		<div>Evo</div>
 		<div>Bob vs Jim</div>
 		</div>
@@ -118,6 +153,7 @@ $imgURL = $MatchImage->getAvatar();
 		</div>
 	</div>			
 </div>
+-->
 </body>
 
 </html>
