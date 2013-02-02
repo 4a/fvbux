@@ -101,6 +101,10 @@ function checkPoints($user, $betamount) {
 	}
 }
 
+function daysToSeconds($days) {
+	return 86400 * $days;
+}
+
 /*
 If the bets_matches table gets more colums then this class needs to be updated accordingly
 Assuming new column is needed:
