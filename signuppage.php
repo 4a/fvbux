@@ -7,6 +7,7 @@ if(isset($_SESSION['loggedin'])) {
 require('PHP/connect.php');
 require('PHP/PasswordHash.php');
 
+$errmail = "";
 $erruser = "";
 $errpass = "";
 if(array_key_exists('submit',$_POST)) {
@@ -14,6 +15,7 @@ if(array_key_exists('submit',$_POST)) {
 
 	$username = $_POST['username'];
 	$password = $_POST['password'];
+	$email = $_POST['email'];
 
 	if(preg_match("/^[A-Za-z0-9_-]{3,16}$/", $username) === 0) {
 		$erruser = "Username must be 3-16 characters long and only contain alphanumeric characters, '_' and '-'";
@@ -24,7 +26,12 @@ if(array_key_exists('submit',$_POST)) {
 		$errpass = "Password must be at least 6 characters";
 		$validated = false;
 	}
-	
+
+        if(preg_match("/^[_a-z0-9-]+(\.[_a-z0-9-]+)*@[a-z0-9-]+(\.[a-z0-9-]+)*(\.[a-z]{2,3})$/", $email) === 0) {
+		$errmail = "You must enter a valid e-mail address (name@domain.tld)";
+		$validated = false;
+	}
+
 	if($stmt = $mysqli->prepare("SELECT COUNT(username) FROM user WHERE username=?")) {
 		$stmt->bind_param("s", $username);
 		$stmt->execute();
@@ -32,7 +39,7 @@ if(array_key_exists('submit',$_POST)) {
 		$stmt->fetch();
 		$stmt->close();
 	} else {
-		echo "Database connection error; could not complete sign ip: (" . $mysqli->errno . ") " . $mysqli->error;
+		echo "Database connection error; could not complete sign up: (" . $mysqli->errno . ") " . $mysqli->error;
 		$validated = false;
 	}
 	
@@ -41,13 +48,26 @@ if(array_key_exists('submit',$_POST)) {
 		$validated = false;
 	}
 	
+	if($stmt = $mysqli->prepare("SELECT COUNT(email) FROM user WHERE email=?")) {
+		$stmt->bind_param("s", $email);
+		$stmt->execute();
+		$stmt->bind_result($count);
+		$stmt->fetch();
+		$stmt->close();
+	} else {
+		echo "Database connection error; could not complete sign up: (" . $mysqli->errno . ") " . $mysqli->error;
+		$validated = false;
+	}
+	
+	if($count > 0) {
+		$errmail = "A username has already been registered with this e-mail. Reset password?";
+		$validated = false;
+	}
+
 	if($validated) {
 		$Hasher = new PasswordHash(8, FALSE);
 
 		$hash = $Hasher->HashPassword($password);
-//		echo "Hash: " . $hash . "<br />";
-
-		
 
 		if(!($stmt = $mysqli->prepare("INSERT INTO user VALUES (?,?,?,?,?,?)"))) {
 			echo "Prepare failed: (" . $mysqli->errno . ") " . $mysqli->error;
@@ -55,9 +75,8 @@ if(array_key_exists('submit',$_POST)) {
 
 		$id = null;
 		$points = 100;
-		$email = "";
 		$acclevel = "user";
-		if (!$stmt->bind_param("ississ", $id, $username, $hash, $email, $points, $acclevel)) {
+		if (!$stmt->bind_param("ississ", $id, $username, $hash, $points, $email, $acclevel)) {
 			echo "Binding parameters failed: (" . $stmt->errno . ") " . $stmt->error;
 		}
 
@@ -66,6 +85,8 @@ if(array_key_exists('submit',$_POST)) {
 		}
 		$_SESSION["loggedin"] = "yes";
 		$_SESSION['name'] = $username;
+		$_SESSION['email'] = $email;
+		$_SESSION['level'] = "user";
 		header('Location:players.php');
 	}
 }
@@ -77,36 +98,30 @@ if(array_key_exists('submit',$_POST)) {
 <title>Fightan' /v/idya</title>
 <link rel="shortcut icon" href="FV.ico" >
 <link rel="stylesheet" type="text/css" href="CSS/newfightans.css">
+<link rel="stylesheet" type="text/css" href="CSS/tempstyles.css">
 <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js" type="text/javascript"></script>
-<style>
-#user
-{
-  display:block;
-  position:fixed;
-  top:15px;
-  right:30px;
-}
-#fvbux
-{
-  display:block;
-  text-align:center;
-}
-#create
-{
-  text-align:center;
-}
-</style>
 </head>
 <body>
 <?php
 include 'menu.php';
 ?>
-Sign Up:
-<form action="<?php echo $_SERVER['PHP_SELF']; ?>" method='post'>
-Username: <input type="text" name="username" > <?php if($erruser != "") { echo $erruser; } ?><br />
-Password: <input type="password" name="password" > <?php if($errpass != "") { echo $errpass; } ?><br />
-<input type="submit" name="submit" value="Submit" />
+<div class='signup'>
+     <h2>Register an account</h2>
 
-</form>
+     <form action="<?php echo $_SERVER['PHP_SELF']; ?>" method='post'>
+     <div>E-mail</div>
+     <input type="text" name="email" class="textinput"> 
+     <?php if($errmail != "") { echo "<div class='error'>" .  $errmail . "</div>"; } ?><br />
+
+     <div>Username</div>
+     <input type="text" name="username" class="textinput"> 
+     <?php if($erruser != "") { echo "<div class='error'>" .  $erruser . "</div>"; } ?><br />
+     
+     <div>Password</div>
+     <input type="password" name="password" class="textinput">
+     <?php if($errpass != "") { echo "<div class='error'>" . $errpass . "</div>"; } ?><br />
+     <input type="submit" name="submit" value="Submit" />
+     </form>
+</div>
 </body>
 </html>
