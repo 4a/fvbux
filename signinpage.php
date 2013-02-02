@@ -46,66 +46,19 @@ if(array_key_exists('submit',$_POST)) {
 <title>Fightan' /v/idya</title>
 <link rel="shortcut icon" href="FV.ico" >
 <link rel="stylesheet" type="text/css" href="CSS/newfightans.css">
+<link rel="stylesheet" type="text/css" href="CSS/tempstyles.css">
 <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js" type="text/javascript"></script>
-<style>
-.loginbox
-{
-position:relative;
-height:384px;
-width:640px;
-margin:auto;
-margin-top:40px;
-background:#11183F;
-border:1px solid #fff;
-}
-
-.signin
-{
-width:300px;
-height:382px;
-display:inline-block;
-position:relative;
-padding:0px 16px;
-}
-
-.separator
-{
-width:1px;
-height:352px;
-background:#fff;
-display:inline-block;
-position:absolute;
-left:50%;
-top:17px;
-}
-
-.register
-{
-width:300px;
-height:382px;
-display:inline;
-position:absolute;
-left:50%;
-padding:0px 16px;
-}
-
-.textinput
-{
-width:280px;
-}
-
-</style>
 </head>
 <body>
 <?php
 include 'menu.php';
 ?>
-<?php if($errlogin != "") { echo "<div style='color:red'>$errlogin</div><br />"; } ?>
 <div class="loginbox">
 
 <div class='signin'>
 	<h2>Sign in</h2>
 	
+	<?php if($errlogin != "") { echo "<div class='error'>$errlogin</div><br />"; } ?>
 	<form action="<?php echo $_SERVER['PHP_SELF']; ?>" method='post'>
 	<div>Username</div>
 	<input type="text" name="username" class="textinput"><br />
@@ -115,13 +68,13 @@ include 'menu.php';
 </div>
 
 <div class='separator'></div>
-	
+
 <div class='register'>
 	<h2>Register</h2>
 	<p>Don't have an account?</p>
 	<p><a href='signuppage.php'>Register</a> a new account</p>
 </div>
 		
-</div>	
+</div>
 </body>
 </html>
