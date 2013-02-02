@@ -1,12 +1,33 @@
 /* This file was made to have style consistency between the new pages. The shared elements like the user login thing should look the same accross pages now. All pages (players, bets, createbet, playerbet, adminpanel) styles were replaced with this file except on some pages (bets, playerbet, createbet) there was a body {text-align:center} property to center the text. I left these in for appearances but these pages should be changed so that the text that needs to be centered is inside some element rather than just sitting in the body and the body styles should be removed. */
 
 /* this was only in adminpanel.php. could be applied to other pages with error messages later */
-#error
+.error
 {
   color: red;
 }
 
+/* this is the custom font for displaying the fvbux symbol */
+@font-face {
+  font-family: "FVbux";
+  src: url( FVbux.eot ); /* IE */
+  src: local("FVbux"), url(../FVbux.ttf) format("truetype"); /* non-IE */
+}
+
+/* set element class to fvbux to display the fvbux symbol */
+.fvbux
+{
+font-family:"FVbux", arial, sans-serif;
+}
+
+/* this is the thing that's on players.php that tells you how much money you have. it's unrelated to the symbol but shares the name 'fvbux'*/
+#fvbux{
+text-align:center;
+font-size:50px;
+text-shadow: #388CC8 1px 1px 2px;
+}
+
 /* ------- Begin top right user dropdown thing ------------- */
+
 /* this is the div that contains the login link, user dropdown and avatar */
 #user
 {
@@ -170,13 +191,6 @@ border-top-right-radius:5px;
 border-top-left-radius:5px;
 }
 
-/* just used for quick margins for words inside boxes */
-p
-{
-padding:10px;
-margin:0px;
-}
-
 /* right side of user profiles. has the leaderboard and current bet stuff right now. maybe it should be something else */
 #content-right
 {
@@ -233,3 +247,64 @@ border-radius: 10px;
 margin:20px 0px 0px 0px;
 border:5px solid #000;
 }
+/* ---------- end widgets -----------------*/
+
+/* ----------- login and register page styles ------------- */
+.loginbox
+{
+position:relative;
+height:384px;
+width:640px;
+margin:auto;
+margin-top:40px;
+background:#11183F;
+border:1px solid #fff;
+}
+
+.signin
+{
+width:300px;
+height:382px;
+display:inline-block;
+position:relative;
+padding:0px 16px;
+}
+
+.signup
+{
+position:relative;
+height:384px;
+width:320px;
+margin:auto;
+margin-top:40px;
+background:#11183F;
+border:1px solid #fff;
+padding:0px 16px;
+}
+
+.separator
+{
+width:1px;
+height:352px;
+background:#fff;
+display:inline-block;
+position:absolute;
+left:50%;
+top:17px;
+}
+
+.register
+{
+width:300px;
+height:382px;
+display:inline;
+position:absolute;
+left:50%;
+padding:0px 16px;
+}
+
+.textinput
+{
+width:280px;
+}
+/* -------------- end of login/register styles ----------- */
