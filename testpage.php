@@ -100,30 +100,42 @@ $imgURL = $MatchImage->getAvatar();
 ?>
 <div id='matchesBox'>
 <?php
-if($stmt = $mysqli->prepare("SELECT `ID`, `Input 1`, `Input 2`, `Mod` FROM `bets_matches` ORDER BY `ID` DESC LIMIT 10")) {
+if($stmt = $mysqli->prepare("SELECT `ID`, `Input 1`, `Input 2`, `Mod`, `Timestamp` FROM `bets_matches` ORDER BY `ID` DESC LIMIT 10")) {
 	$stmt->execute();
-	$stmt->bind_result($matchNo, $name1, $name2, $mod);
+	$stmt->bind_result($matchNo, $name1, $name2, $mod, $timestamp);
 
 	while($stmt->fetch()) {
 		/* Need the user meta table and link the <img> tag to their avatar 
 			And also fill in the missing info when the sql tables are updated with it*/
-	
-		echo "
-		<a href='bets.php?" . $matchNo . "'>
-		<div class='matchContainer'>
-			<div class='match'>
-			<img src='" . $imgURL . "' alt='pic' >
-			<div>Event Name Here</div>
-			<div>" . $name1 . " vs " . $name2 . "</div>
-			</div>
-			
-			<div class='matchInfo'>
-			<div>Mod: ". $mod . "</div>
-			<div>Info: Info Goes Here</div>
-			</div>
-		</div>
-		</a>";
+		$currenttime = strtotime('now');
+		$timelimit = daysToSeconds(1);
 		
+		if(($currenttime - $timestamp) > $timelimit) {
+			/* Change status of bets_matches and any bets that are linked to that ,atch to 'timeout' */
+			if($stmt->prepare("UPDATE bets_matches, bets_money 
+			SET bets_matches.status = 'timeout', bets_money.status = 'timeout'
+			WHERE bets_matches.ID = ? AND bets_money.match = bets_matches.ID") {
+				
+				$stmt->bind_param("i", $matchNo);
+				$stmt->execute();
+			}
+		} else {
+			echo "
+			<a href='bets.php?" . $matchNo . "'>
+			<div class='matchContainer'>
+				<div class='match'>
+				<img src='" . $imgURL . "' alt='pic' >
+				<div>Event Name Here</div>
+				<div>" . $name1 . " vs " . $name2 . "</div>
+				</div>
+				
+				<div class='matchInfo'>
+				<div>Mod: ". $mod . "</div>
+				<div>Info: Info Goes Here</div>
+				</div>
+			</div>
+			</a>";
+		}
 	}
 
 }
