@@ -195,9 +195,7 @@ else
  if(isset($_SESSION['loggedin'])) 
  {
   echo "
-        <div id='fvbux'>You have <br>
-        $totalpoints
-        <br>FVBux</div>
+        <div id='fvbux'>You have <br><span class='fvbux'>$</span>" . $totalpoints . "</div>
         <div id='create'><a href='bets.php'>Create new match</a></div>
        ";
  } 
@@ -233,14 +231,14 @@ while ($stmt->fetch())
   /*background: #71B7E6;*/
   background: #48779A;
   color: white;
-  font-weight:bold;
+  font-weight:normal;
   text-shadow: black 1px 1px 0px;
   overflow: hidden;
   -moz-border-radius: 0 3px 3px 0;
   border-radius: 0 3px 3px 0;
   min-width:25px;
   width:". round(($leadpoints / $highest) * 95) ."%'>
-  ". $leadpoints ." FVBux
+  <span class='fvbux'>$</span>". $leadpoints ."
   </div>";
 
  $lastpoints = $leadpoints;
