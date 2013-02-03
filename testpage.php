@@ -102,27 +102,35 @@ $imgURL = $MatchImage->getAvatar();
 <?php
 if($stmt = $mysqli->prepare("SELECT `ID`, `Input 1`, `Input 2`, `Mod`, `Timestamp` FROM `bets_matches` 
 WHERE status = 'open' ORDER BY `ID` DESC LIMIT 10")) {
-	echo "inside first sql";
 	$stmt->execute();
 	$stmt->bind_result($matchNo, $name1, $name2, $mod, $timestamp);
 
 	while($stmt->fetch()) {
-		echo "inside while";
 		/* Need the user meta table and link the <img> tag to their avatar 
 			And also fill in the missing info when the sql tables are updated with it*/
 		$currenttime = strtotime('now');
 		$timelimit = daysToSeconds(1);
+		echo "<br />currenttime = " . $currenttime;
+		echo "<br />timestamp = " . $timestamp;
+		echo " " . $currenttime - $timestamp . " ";
 		
 		if(($currenttime - $timestamp) > $timelimit) {
+			echo "inside if, matchNo = " . $matchNo;
 			/* Change status of bets_matches and any bets that are linked to that ,atch to 'timeout' */
-			if($stmt->prepare("UPDATE bets_matches, bets_money 
-			SET bets_matches.status = 'timeout', bets_money.status = 'timeout'
-			WHERE bets_matches.ID = ? AND bets_money.match = ?")) {
-			
-				echo "inside status change    " . $matchNo;
-				$stmt->bind_param("ii", $matchNo, $matchNo);
-				$stmt->execute();
+			if($stmt1 = $mysqli->prepare("UPDATE `bets_matches` SET `status` = 'timeout' WHERE `ID` = ?")) {
+				echo "inside sql1 " . $matchNo;
+				$stmt1->bind_param("i", $matchNo);
+				$stmt1->execute();
 			}
+			
+			if($stmt2 = $mysqli->prepare("UPDATE `bets_money` SET `status`='timeout' WHERE `match`=?")) {
+				echo "inside sql2 ". $matchNo;
+				$stmt2->bind_param("i", $matchNo);
+				$stmt2->execute();
+            }
+			
+			echo "<br /><br />";
+			
 		} else {
 			echo "inside list";
 			echo "
