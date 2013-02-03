@@ -121,6 +121,7 @@ class MatchInfo {
 	private $ModIP;
 	private $Status;
 	private $Winner;
+	private $Timestamp;
 	
 	function __construct($mid) {
 		$this->MatchID = $mid;
@@ -132,7 +133,7 @@ class MatchInfo {
 		if($stmt = $mysqli->prepare("SELECT * FROM bets_matches WHERE ID=?")) {
 			$stmt->bind_param("i", $this->MatchID);
 			$stmt->execute();
-			$stmt->bind_result($matchid, $input1, $input2, $mod, $modip, $status, $winner);
+			$stmt->bind_result($matchid, $input1, $input2, $mod, $modip, $status, $winner, $timestamp);
 			$stmt->fetch();
 			
 			$this->MatchID = $matchid;
@@ -142,6 +143,7 @@ class MatchInfo {
 			$this->ModIP = $modip;
 			$this->Status = $status;
 			$this->Winner = $winner;
+			$this->Timestamp = $timestamp;
 		}
 	}
 	
@@ -152,6 +154,7 @@ class MatchInfo {
 	public function getModIP() { return $this->ModIP; }
 	public function getStatus() { return $this->Status; }
 	public function getWinner() { return $this->Winner; }
+	public function getTimestamp() { return $this->Timestamp; }
 }
 
 class BetInfo {
