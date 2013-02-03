@@ -104,46 +104,56 @@ if($stmt = $mysqli->prepare("SELECT `ID`, `Input 1`, `Input 2`, `Mod`, `Timestam
 WHERE status = 'open' ORDER BY `ID` DESC LIMIT 10")) {
 	$stmt->execute();
 	$stmt->bind_result($matchNo, $name1, $name2, $mod, $timestamp);
-
+	
+	$resultset = Array();
 	while($stmt->fetch()) {
+		$resultset[] = array(
+			"ID" 				=> $matchNo,
+			"Input1" 		=> $name1,
+			"Input2"		=> $name2,
+			"Mod"			=> $mod,
+			"Timestamp" 	=> $timestamp,
+			);
+	}
+	
+	foreach($resultset as $result) {
 		/* Need the user meta table and link the <img> tag to their avatar 
 			And also fill in the missing info when the sql tables are updated with it*/
 		$currenttime = strtotime('now');
 		$timelimit = daysToSeconds(1);
-		echo "<br />currenttime = " . $currenttime;
-		echo "<br />timestamp = " . $timestamp;
-		echo " " . $currenttime - $timestamp . " ";
+		$timestamp = strtotime($timestamp);
 		
 		if(($currenttime - $timestamp) > $timelimit) {
-			echo "inside if, matchNo = " . $matchNo;
+			$ID = $result['ID'];
+		
 			/* Change status of bets_matches and any bets that are linked to that ,atch to 'timeout' */
 			if($stmt1 = $mysqli->prepare("UPDATE `bets_matches` SET `status` = 'timeout' WHERE `ID` = ?")) {
-				echo "inside sql1 " . $matchNo;
-				$stmt1->bind_param("i", $matchNo);
+
+				$stmt1->bind_param("i", $ID);
 				$stmt1->execute();
+			} else {
+				echo "Prepare failed: (" . $mysqli->errno . ") " . $mysqli->error;
 			}
 			
 			if($stmt2 = $mysqli->prepare("UPDATE `bets_money` SET `status`='timeout' WHERE `match`=?")) {
-				echo "inside sql2 ". $matchNo;
-				$stmt2->bind_param("i", $matchNo);
+				$stmt2->bind_param("i", $ID);
 				$stmt2->execute();
-            }
-			
-			echo "<br /><br />";
+            } else {
+				echo "Prepare failed: (" . $mysqli->errno . ") " . $mysqli->error;
+			}
 			
 		} else {
-			echo "inside list";
 			echo "
-			<a href='bets.php?" . $matchNo . "'>
+			<a href='bets.php?" . $result['ID'] . "'>
 			<div class='matchContainer'>
 				<div class='match'>
 				<img src='" . $imgURL . "' alt='pic' >
 				<div>Event Name Here</div>
-				<div>" . $name1 . " vs " . $name2 . "</div>
+				<div>" . $result['Input1'] . " vs " . $result['Input2'] . "</div>
 				</div>
 				
 				<div class='matchInfo'>
-				<div>Mod: ". $mod . "</div>
+				<div>Mod: ". $result['Mod'] . "</div>
 				<div>Info: Info Goes Here</div>
 				</div>
 			</div>
