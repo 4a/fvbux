@@ -10,6 +10,7 @@ require('PHP/functionlist.php');
 <title>Fightan' /v/idya</title>
 <link rel="shortcut icon" href="FV.ico" >
 <link rel="stylesheet" type="text/css" href="CSS/newfightans.css">
+<link rel="stylesheet" type="text/css" href="CSS/tempstyles.css">
 <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js" type="text/javascript"></script>
 <script type="text/javascript" src="JS/idtabs.js"></script>
 <style>
@@ -27,6 +28,8 @@ require('PHP/functionlist.php');
  height:auto;
  width:492px;
  margin:auto;
+ border: 3px solid grey;
+ border-bottom: 0px;
 }
 
 .matchContainer
@@ -34,9 +37,7 @@ require('PHP/functionlist.php');
  height: 53px;
  width: 100%;
  background-color: white;
- border-style: solid;
- border-width: 3px;
- border-color: grey;
+ border-bottom: 3px solid grey;
  color: black;
  overflow:hidden;
  position:relative;
@@ -50,25 +51,23 @@ require('PHP/functionlist.php');
  width:50%;
  min-height:100%;
  float:left;
- padding: 4px 4px 4px 4px;
+ padding: 4px;
 }
-
-/* since the widths of these divs is 50% adding a border between the match div and the info div will create a line break. if you want a border it would be better to set the widths to a pixel value that is half of the width of the container minus the width of the border you want. */
 
 .matchInfo
 {
  width:50%;
  min-height:100%;
  margin-left: 50%;
- border-left: solid 1px grey;
- padding: 4px 4px 4px 4px;
+ border-left: solid 3px grey;
+ padding: 4px;
 }
 
 .match img {
  float: left;
  width: 45px;
  height: 45px;
- padding-right: 3px;
+ padding-right: 4px;
 }
 
 .match .eventName
@@ -93,9 +92,9 @@ require('PHP/functionlist.php');
 include('user.php'); 
 
 $MatchImage = new TalkPHP_Gravatar();
-$MatchImage->setEmail($_SESSION['email']);
+/*$MatchImage->setEmail($_SESSION['email']);
 $MatchImage->setSize(45);
-$imgURL = $MatchImage->getAvatar();
+$imgURL = $MatchImage->getAvatar();*/
 
 ?>
 <div id='matchesBox'>
@@ -108,11 +107,11 @@ WHERE status = 'open' ORDER BY `ID` DESC LIMIT 10")) {
 	$resultset = Array();
 	while($stmt->fetch()) {
 		$resultset[] = array(
-			"ID" 				=> $matchNo,
-			"Input1" 		=> $name1,
-			"Input2"		=> $name2,
-			"Mod"			=> $mod,
-			"Timestamp" 	=> $timestamp,
+			"ID"=>$matchNo,
+			"Input1"=>$name1,
+			"Input2"=>$name2,
+			"Mod"=>$mod,
+			"Timestamp"=>$timestamp,
 			);
 	}
 	
@@ -121,30 +120,34 @@ WHERE status = 'open' ORDER BY `ID` DESC LIMIT 10")) {
 			And also fill in the missing info when the sql tables are updated with it*/
 		$currenttime = strtotime('now');
 		$timelimit = daysToSeconds(1);
-		$timestamp = strtotime($timestamp);
+		$timestamp = strtotime($result['Timestamp']);
 		
 		if(($currenttime - $timestamp) > $timelimit) {
 			$ID = $result['ID'];
 		
-			/* Change status of bets_matches and any bets that are linked to that ,atch to 'timeout' */
+			/* Change status of bets_matches and any bets that are linked to that match to 'timeout' */
 			if($stmt1 = $mysqli->prepare("UPDATE `bets_matches` SET `status` = 'timeout' WHERE `ID` = ?")) {
-
-				$stmt1->bind_param("i", $ID);
+				$stmt1->bind_param("i", $result['ID']);
 				$stmt1->execute();
 			} else {
 				echo "Prepare failed: (" . $mysqli->errno . ") " . $mysqli->error;
-			}
-			
+			}			
 			if($stmt2 = $mysqli->prepare("UPDATE `bets_money` SET `status`='timeout' WHERE `match`=?")) {
-				$stmt2->bind_param("i", $ID);
+				$stmt2->bind_param("i", $result['ID']);
 				$stmt2->execute();
-            } else {
+            		} else {
 				echo "Prepare failed: (" . $mysqli->errno . ") " . $mysqli->error;
 			}
 			
 		} else {
+			$UserInfo = new UserInfo($result['Mod']);
+			/* using user email until gravatar field exists */
+			$email = $UserInfo->getEmail();
+			$MatchImage->setEmail($email);
+			$MatchImage->setSize(45);
+			$imgURL = $MatchImage->getAvatar();	
 			echo "
-			<a href='bets.php?" . $result['ID'] . "'>
+			<a href='bets.php?mid=" . $result['ID'] . "'>
 			<div class='matchContainer'>
 				<div class='match'>
 				<img src='" . $imgURL . "' alt='pic' >
