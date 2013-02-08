@@ -79,10 +79,17 @@ if(array_key_exists('submit',$_POST)) {
 		if (!$stmt->bind_param("ississ", $id, $username, $hash, $points, $email, $acclevel)) {
 			echo "Binding parameters failed: (" . $stmt->errno . ") " . $stmt->error;
 		}
-
+		
 		if (!$stmt->execute()) {
 			echo "Execute failed: (" . $stmt->errno . ") " . $stmt->error;
-		}
+		}	
+		
+		$id = $stmt->insert_id;
+		if(($stmt = $mysqli->prepare("INSERT INTO user_meta (uid, gravemail) VALUES (?,?)"))) {
+			$stmt->bind_param("is", $id, $email);
+			$stmt->execute();
+		}	
+		
 		$_SESSION["loggedin"] = "yes";
 		$_SESSION['name'] = $username;
 		$_SESSION['email'] = $email;
@@ -110,7 +117,7 @@ include 'menu.php';
 
      <form action="<?php echo $_SERVER['PHP_SELF']; ?>" method='post'>
      <div>E-mail</div>
-     <input type="text" name="email" class="textinput"> 
+     <input type="text" name="email" class="textinput">  
      <?php if($errmail != "") { echo "<div class='error'>" .  $errmail . "</div>"; } ?><br />
 
      <div>Username</div>

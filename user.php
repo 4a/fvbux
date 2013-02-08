@@ -15,6 +15,7 @@ if(isset($_SESSION['loggedin'])) {
         if ($_SESSION['level'] === "admin") {
         echo "<div><a href='adminpanel.php'>Admin Panel</a></div>";}
         echo " 
+        	<div><a href='noteventhubs.php'>Account Settings</a></div>
 		<div><a href='players.php?user=". $_SESSION['name'] ."'>My Profile</a></div> 
         	<div><a href='PHP/signout.php'>Log Out</a></div>
         	</div>

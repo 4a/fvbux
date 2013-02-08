@@ -29,6 +29,14 @@ function doesUserExist($username) {
 	}
 }
 
+function updateProfile($uid, $gravemail, $location, $lat, $long, $GGPO, $LIVE, $PSN) {
+	global $mysqli;
+	if($stmt = $mysqli->prepare("REPLACE INTO `user_meta` (`uid`, `gravemail`, `location`, `lat`, `long`, `GGPO`, `LIVE`, `PSN`) VALUES (?,?,?,?,?,?,?,?)")) {
+		$stmt->bind_param("issiisss", $uid, $gravemail, $location, $lat, $long, $GGPO, $LIVE, $PSN);
+		$stmt->execute();
+	}
+}
+
 function updatePoints($winnings, $user) {
 	global $mysqli;
 	if($stmt = $mysqli->prepare("UPDATE user SET points = points + ? WHERE username = ?")) {
@@ -231,5 +239,44 @@ class UserInfo {
 	public function getPoints() { return $this->Points; }
 	public function getEmail() { return $this->Email; }
 	public function getAccountLevel() { return $this->AccountLevel; }
+}
+
+class UserMetaInfo {
+	
+	private $MetaID;
+	private $UserID;
+	private $GravEmail;
+	private $Location;
+	private $Latitude;
+	private $Longitude;
+	private $GGPO;
+	private $LIVE;
+	private $PSN;
+	
+		function __construct($uid) {
+		$this->UserID = $uid;
+		$this->getInfo();
+	}
+	
+	private function getInfo() {
+		global $mysqli;
+		if($stmt = $mysqli->prepare("SELECT * FROM user_meta WHERE uid=?")) {
+			$stmt->bind_param("i", $this->UserID);
+			$stmt->execute();
+			$stmt->bind_result($this->UserID, $this->GravEmail, $this->Location, $this->Latitude,
+										$this->Longitude, $this->GGPO, $this->LIVE, $this->PSN);
+			$stmt->fetch();
+		}
+	}
+	
+//	public function getMetaID() { return $this->MetaID; }
+	public function getUserID() { return $this->UserID; }
+	public function getGravEmail() { return $this->GravEmail; }
+	public function getLocation() { return $this->Location; }
+	public function getLatitude() { return $this->Latitude; }
+	public function getLongitude() { return $this->Longitude; }
+	public function getGGPO() { return $this->GGPO; }
+	public function getLIVE() { return $this->LIVE; }
+	public function getPSN() { return $this->PSN; }
 }
 ?>
