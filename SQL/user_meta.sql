@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- Host: localhost
--- Generation Time: Feb 08, 2013 at 12:08 PM
+-- Generation Time: Feb 08, 2013 at 12:48 PM
 -- Server version: 5.5.28-cll
 -- PHP Version: 5.2.17
 
@@ -43,8 +43,11 @@ CREATE TABLE IF NOT EXISTS `user_meta` (
 --
 
 INSERT INTO `user_meta` (`uid`, `gravemail`, `location`, `lat`, `long`, `GGPO`, `LIVE`, `PSN`) VALUES
+(1, 'stickystaines@gmail.com', '', NULL, NULL, '', '', ''),
+(2, '', '', NULL, NULL, '', '', ''),
 (5, 'furryforay@gmail.com', 'socal', 33.00000000, -117.00000000, '4a4a', 'AFTERBIRTH WOO', ''),
-(6, 'test', '', 0.00000000, 0.00000000, '', '', '');
+(6, 'test', '', 0.00000000, 0.00000000, '', '', ''),
+(7, 'rick_danto@hotmail.com', '', NULL, NULL, '', '', '');
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
