@@ -1,7 +1,35 @@
 <?php
 session_start();
-require('PHP/connect.php');
 require('PHP/functionlist.php');
+
+$IP = $_SERVER['REMOTE_ADDR'];
+$IP = ip2long($IP);
+/* $IPBYPASS is used to get around the ip check so you are able to test bet creation locally */
+$IPBYPASS = FALSE;
+
+if(isset($_SESSION['loggedin'])) {
+	$totalpoints = getPoints($_SESSION['name']);
+} else {
+	header('Location: signinpage.php');
+}
+if(array_key_exists('submit',$_POST)) {
+        if(!empty($_POST['input1'])) {
+		$submitinput1 = $_POST['input1'];
+	} else {
+		$errmsg = "You didn't fill in the first box.";
+	}
+        if(!empty($_POST['input2'])) {
+		$submitinput2 = $_POST['input2'];
+	} else {
+		$errmsg = "You didn't fill in the second box.";
+	}
+	if(empty($_POST['input1']) && empty($_POST['input2'])) {
+		$errmsg = "You didn't even try to fill in a box.";
+	}
+	if(!isset($errmsg)) {
+	$newMID = createMatch($submitinput1, $submitinput2, $_SESSION['name'], $IP);
+	header('Location:bets.php?mid='.$newMID);}
+}
 ?>
 <!DOCTYPE HTML>
 <html>
@@ -12,186 +40,170 @@ require('PHP/functionlist.php');
 <link rel="stylesheet" type="text/css" href="CSS/newfightans.css">
 <link rel="stylesheet" type="text/css" href="CSS/tempstyles.css">
 <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js" type="text/javascript"></script>
-<script type="text/javascript" src="JS/idtabs.js"></script>
 <style>
-#user
+body
 {
- display:block;
- position:absolute;
- top:15px;
- right:30px;
- line-height:22px;
-}
-
-#matchesBox
-{
- height:auto;
- width:492px;
- margin:auto;
- border: 3px solid grey;
- border-bottom: 0px;
-}
-
-.matchContainer
-{
- height: 53px;
- width: 100%;
- background-color: white;
- border-bottom: 3px solid grey;
- color: black;
- overflow:hidden;
- position:relative;
- transition: all 300ms ease-out;
- -moz-transition: all 300ms ease-out;
- -webkit-transition: all 300ms ease-out;
-}
-
-.match
-{
- width:50%;
- min-height:100%;
- float:left;
- padding: 4px;
-}
-
-.matchInfo
-{
- width:50%;
- min-height:100%;
- margin-left: 50%;
- border-left: solid 3px grey;
- padding: 4px;
-}
-
-.match img {
- float: left;
- width: 45px;
- height: 45px;
- padding-right: 4px;
-}
-
-.match .eventName
-{
-}
-
-.match .competitors
-{
- font-size: 1.4em;
-}
-
-.matchContainer:hover
-{
- background-color: #297EFF;
- color: white;
-}
+  text-align:center;
+}  
 </style>
 </head>
-
 <body>
-<?php 
-include('user.php'); 
-
-$MatchImage = new TalkPHP_Gravatar();
-/*$MatchImage->setEmail($_SESSION['email']);
-$MatchImage->setSize(45);
-$imgURL = $MatchImage->getAvatar();*/
-
-?>
-<div id='matchesBox'>
 <?php
-if($stmt = $mysqli->prepare("SELECT `ID`, `Input 1`, `Input 2`, `Mod`, `Timestamp` FROM `bets_matches` 
-WHERE status = 'open' ORDER BY `ID` DESC LIMIT 10")) {
-	$stmt->execute();
-	$stmt->bind_result($matchNo, $name1, $name2, $mod, $timestamp);
-	
-	$resultset = Array();
-	while($stmt->fetch()) {
-		$resultset[] = array(
-			"ID"=>$matchNo,
-			"Input1"=>$name1,
-			"Input2"=>$name2,
-			"Mod"=>$mod,
-			"Timestamp"=>$timestamp,
-			);
+include 'menu.php';
+include 'user.php';
+?>
+<?php
+if(isset($errmsg)) {
+	echo "<div style='color:red'>" . $errmsg . "</div>";
+}
+
+if(isset($_GET['mid']) and !empty($_GET['mid']) and ctype_digit($_GET['mid'])) {
+	$match_ID = $_GET['mid'];
+	$match_ID = $mysqli->real_escape_string($match_ID);
+	$Match = new MatchInfo($match_ID);
+	$matchid = $Match->getMatchID();
+	$input1 = $Match->getInput1();
+	$input2 = $Match->getInput2();
+	$mod = $Match->getMod();
+	$modip = $Match->getModIP();
+	$matchstatus = $Match->getStatus();
+	$matchwinner = $Match->getWinner();
+	if ($matchwinner === $input1) {
+		$matchloser = $input2;
 	}
-	
-	foreach($resultset as $result) {
-		/* Need the user meta table and link the <img> tag to their avatar 
-			And also fill in the missing info when the sql tables are updated with it*/
-		$currenttime = strtotime('now');
-		$timelimit = daysToSeconds(1);
-		$timestamp = strtotime($result['Timestamp']);
-		
-		if(($currenttime - $timestamp) > $timelimit) {
-			$ID = $result['ID'];
-		
-			/* Change status of bets_matches and any bets that are linked to that match to 'timeout' */
-			if($stmt1 = $mysqli->prepare("UPDATE `bets_matches` SET `status` = 'timeout' WHERE `ID` = ?")) {
-				$stmt1->bind_param("i", $result['ID']);
-				$stmt1->execute();
-			} else {
-				echo "Prepare failed: (" . $mysqli->errno . ") " . $mysqli->error;
-			}			
-			if($stmt2 = $mysqli->prepare("UPDATE `bets_money` SET `status`='timeout' WHERE `match`=?")) {
-				$stmt2->bind_param("i", $result['ID']);
-				$stmt2->execute();
-            		} else {
-				echo "Prepare failed: (" . $mysqli->errno . ") " . $mysqli->error;
+	else {
+		$matchloser = $input1;
+	}
+
+/* Match ID in mid parameter exists */
+	if($matchid == $match_ID) {
+
+/* Match status is open */
+		if ($matchstatus === "open") {
+
+/* Moderator Options - Winner selection and bet freezing */
+			if ($_SESSION['name'] === $mod) {
+				echo "<h1>" . $input1 . "</h1>
+									<form action='declarewinner.php' method='POST'>
+				<input type='hidden' name='matchid' value='" . $match_ID . "'>
+				<input type='hidden' name='winner' value='" . $input1 . "'>
+									<input type='image' src='IS/tick.png' name='submit'>
+				</form>";
+				echo "<h4>VS</h4>";
+				echo "<h1>" . $input2 . "</h1>
+				<form action='declarewinner.php' method='POST'>
+				<input type='hidden' name='matchid' value='" . $match_ID . "'>
+				<input type='hidden' name='winner' value='" . $input2 . "'>
+				<input type='image' src='IS/tick.png' name='submit'>
+				</form>";
+				echo "You are the moderator";
+				echo "<br>Betting status: Open";
 			}
-			
-		} else {
-			$UserInfo = new UserInfo($result['Mod']);
-			/* using user email until gravatar field exists */
-			$email = $UserInfo->getEmail();
-			$MatchImage->setEmail($email);
-			$MatchImage->setSize(45);
-			$imgURL = $MatchImage->getAvatar();	
-			echo "
-			<a href='bets.php?mid=" . $result['ID'] . "'>
-			<div class='matchContainer'>
-				<div class='match'>
-				<img src='" . $imgURL . "' alt='pic' >
-				<div>Event Name Here</div>
-				<div>" . $result['Input1'] . " vs " . $result['Input2'] . "</div>
-				</div>
-				
-				<div class='matchInfo'>
-				<div>Mod: ". $result['Mod'] . "</div>
-				<div>Info: Info Goes Here</div>
-				</div>
-			</div>
-			</a>";
+
+/* Cheating Prevention - Moderator tried to bet with a different account */
+			else if ($IP == $modip and !$IPBYPASS) {
+				echo "<h1>" . $input1 . "</h1>";
+				echo "<h4>VS</h4>";
+				echo "<h1>" . $input2 . "</h1>";
+					echo "<div style='color:red'>You have the same IP as the moderator</div>";
+			}
+
+/* Normal User Page - Select from list of bets or create a new one */
+			else {
+				echo "<h1>" . $input1 . "</h1>";
+				echo "<h4>VS</h4>";
+				echo "<h1>" . $input2 . "</h1>";
+				echo "Moderator: <a href='players.php?user=" . $mod . "'>" . $mod . "</a>";
+
+			/* Begin list of open bets */
+				echo "<br><br><div id='open_bets'>Open Bets:<br>";
+				$stmt = $mysqli->prepare("SELECT `ID`, `username 1`, `value`, `user1choice` FROM `bets_money` WHERE (`match`=? AND `status`='open' AND `private`=0) ");
+				$stmt->bind_param("s", $match_ID);
+				$stmt->execute();
+				$stmt->bind_result($betNo, $user1name, $betvalue, $user1choice);
+				$i = 1;
+				while ($stmt->fetch()) {
+					echo $i++ .". <a href='playerbet.php?bid=". $betNo ."'> ". $betvalue ." FVBux on ". $user1choice ."</a>
+					[<a href='players.php?user=". $user1name ."'>". $user1name ."</a>]<br>";
+				}
+				echo "</div>";
+			/* End list of open bets */
+
+				echo "<br />Select a bet from the list or"
+				."<br /><a href='createbet.php?mid=$match_ID'><img src='IS/createbet.jpg'></a>";
+			}
+		}
+
+/* Match status is locked */
+		else if ($matchstatus === "locked") {
+
+/* Moderator Options - Winner selection and bet freezing */
+			if ($_SESSION['name'] === $mod) {
+				echo "<h1>" . $input1 . "</h1>
+ <form action='declarewinner.php' method='POST'>
+				<input type='hidden' name='matchid' value='" . $match_ID . "'>
+				<input type='hidden' name='winner' value='" . $input1 . "'>
+ <input type='image' src='IS/tick.png' name='submit'>
+				</form>";
+				echo "<h4>VS</h4>";
+				echo "<h1>" . $input2 . "</h1>
+				<form action='declarewinner.php' method='POST'>
+				<input type='hidden' name='matchid' value='" . $match_ID . "'>
+				<input type='hidden' name='winner' value='" . $input2 . "'>
+				<input type='image' src='IS/tick.png' name='submit'>
+				</form>";
+				echo "You are the moderator";
+				echo "<br>Betting status: Locked";
+			}
+/* Normal User Page - Betting is locked, winner not decided yet */
+			else {
+									echo "<h1>" . $input1 . "</h1>";
+				echo "<h4>VS</h4>";
+				echo "<h1>" . $input2 . "</h1>";
+				echo "Betting on this match is locked.";
+									echo "<br><a href='players.php?user=" . $mod . "'>" . $mod . "</a> has not updated this match-up with a winner yet.";
+									echo "<br>Betting may be unlocked at a later time.";
+			}
+		}
+
+
+/* Match status is closed */
+		else {
+			echo "This match has ended.
+			<h1>" . $matchwinner . "</h1>";
+			echo "<h4>Defeated</h4>";
+			echo "<h1>" . $matchloser . "</h1>";
+			/* Begin list of winners */
+				echo "<br><br><div id='open_bets'>Winners:<br>";
+				$stmt = $mysqli->prepare("SELECT `winner`, `value` FROM `bets_money` WHERE `match`=? AND NOT `username 2`='' ORDER BY value DESC");
+				$stmt->bind_param("s", $match_ID);
+				$stmt->execute();
+				$stmt->bind_result($winner, $winnings);
+				$i = 1;
+				while ($stmt->fetch()) {
+					echo $i++ .". <a href='players.php?user=". $winner ."'>". $winner ."</a> won ". $winnings ." FVBux!<br>";
+				}
+				echo "</div>";
+			/* End list of winners */
 		}
 	}
 
+/* Match ID (mid) is invalid */
+	else {
+		echo "Error: Match does not exist in database.<br>
+		<form action='$_SERVER[PHP_SELF]' method='post'>
+		<input type='text' name='input1'>
+		<br>VS<br>
+		<input type='text' name='input2'><br />
+		<input type='submit' name='submit' value='Submit' />";
+	}
+} else {
+	echo "Couldn't find a match. Is the match id given and correct?";
 }
+
+
+
 ?>
-</div>
 
-<!--
-<div id='matchesBox'>
-	<div class='matchContainer'>
-		<div class='match'>
-		<img src='<?//php echo $imgURL; ?>' alt='pic' >
-		<div>Evo</div>
-		<div>Bob vs Jim</div>
-		</div>
-		
-		<div class='matchInfo'>
-		<div>Mod: Joe</div>
-		<div>Info: Losers Bracket Semi-Finals</div>
-		</div>
-	</div>
-	<div class='matchContainer'>
-		<div class='match'>
-		Hiya
-		</div>
-		
-		<div class='matchInfo'>
-		</div>
-	</div>			
-</div>
--->
 </body>
-
 </html>
