@@ -11,21 +11,41 @@ if(isset($_SESSION['loggedin'])) {
 	$totalpoints = getPoints($_SESSION['name']);
 }
 if(array_key_exists('submit',$_POST)) {
-        if(!empty($_POST['input1'])) {
+	$featured = isset($_POST['featured']) ? 'yes' : 'no';
+	$img1 = "";
+	$img2 = "";
+	$description = $_POST['description'];
+    if(!empty($_POST['input1'])) {
 		$submitinput1 = $_POST['input1'];
 	} else {
-		$errmsg = "You didn't fill in the first box.";
+		$errmsg = "You didn't fill in the first betting choice.";
 	}
-        if(!empty($_POST['input2'])) {
+    if(!empty($_POST['input2'])) {
 		$submitinput2 = $_POST['input2'];
 	} else {
-		$errmsg = "You didn't fill in the second box.";
+		$errmsg = "You didn't fill in the second betting choice.";
 	}
 	if(empty($_POST['input1']) && empty($_POST['input2'])) {
-		$errmsg = "You didn't even try to fill in a box.";
+		$errmsg = "You didn't submit any choices to bet on.";
+	}
+	if(!empty($_POST['event'])) {
+		$event = $_POST['event'];
+	} else {
+		$errmsg = "You didn't fill in the event name.";
+	}
+	if(isset($_POST['featured'])){
+		if(!preg_match("/^https?:\/\/(?:[a-z\-]+\.)+[a-z]{2,6}(?:\/[^\/#?]+)+\.(?:jpe?g|gif|png)$/i", $_POST['img1'])
+		|| !preg_match("/^https?:\/\/(?:[a-z\-]+\.)+[a-z]{2,6}(?:\/[^\/#?]+)+\.(?:jpe?g|gif|png)$/i", $_POST['img2'])) {
+			$errmsg = "Invalid image url submitted.";
+		}
+		if(empty($_POST['img1']) || empty($_POST['img2'])) {
+			$errmsg = "Featured matches require images of each choice.";
+		}
+	$img1 = $_POST['img1'];	
+	$img2 = $_POST['img2'];
 	}
 	if(!isset($errmsg)) {
-	$newMID = createMatch($submitinput1, $submitinput2, $_SESSION['name'], $IP);
+	$newMID = createMatch($submitinput1, $submitinput2, $_SESSION['name'], $IP, $event, $description, $featured, $img1, $img2);
 	header('Location:bets.php?mid='.$newMID);}
 }
 ?>
@@ -206,10 +226,15 @@ if(isset($_SESSION['loggedin'])) {
 		<br>As the moderator, you cannot bet on an outcome.
 		<br>You will have the opportunity to earn fvbux based on the amount of people who have participated in your match-up.
 		<form action='$_SERVER[PHP_SELF]' method='post'>
-		<input type='text' name='input1'>
+		input1: <input type='text' name='input1'>
 		<br>VS<br>
-		<input type='text' name='input2'><br>
-		<input type='submit' name='submit' value='Submit' />";
+		input2: <input type='text' name='input2'><br>
+		event: <input type='text' name='event'><br>
+		description: <textarea wrap='physical' name='description'></textarea><br>
+		featured?: <input class='featured' type='checkbox' name='featured' title='Images are required for featured matches.'><br>
+		img1: <input type='text' name='img1'><br>
+		img2: <input type='text' name='img2'><br>
+		<input type='submit' name='submit' value='Submit'/>";
 	}
 }
 

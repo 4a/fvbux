@@ -1,7 +1,7 @@
 <?php
 session_start();
 if(isset($_SESSION['loggedin'])) {
-	header('Location: players.php');
+	header('Location: betmain.php');
 }
 
 $errlogin = "";
@@ -12,11 +12,11 @@ if(array_key_exists('submit',$_POST)) {
 	$username = $_POST['username'];
 	$password = $_POST['password'];
 
-	if(!($stmt = $mysqli->prepare("SELECT user.password, user.acclevel, user_meta.gravemail AS gravemail FROM user,user_meta WHERE user.username=? AND user_meta.uid = user.ID"))) {
+	if(!($stmt = $mysqli->prepare("SELECT user.password, user.acclevel, user_meta.gravemail AS gravemail FROM user,user_meta WHERE user.username=? AND user_meta.uid =?"))) {
 		echo "Prepare failed: (" . $mysqli->errno . ") " . $mysqli->error;
 	}
 
-	if (!$stmt->bind_param("s", $username)) {
+	if (!$stmt->bind_param("ss", $username, $username)) {
 		echo "Binding parameters failed: (" . $stmt->errno . ") " . $stmt->error;
 	}
 
@@ -33,7 +33,12 @@ if(array_key_exists('submit',$_POST)) {
 		$_SESSION['name'] = $username;
 		$_SESSION['level'] = $acclevel;
 		$_SESSION['email'] = $email;
-		header('Location: players.php');
+		
+		if (isset($_POST['return'])){
+		header('Location: '.$_POST['return']);
+		} else {
+		header('Location: betmain.php');}
+		
 	} else {
 		$errlogin = "Username and password combination is not valid";
 	}
@@ -111,6 +116,11 @@ include 'menu.php';
 	<input type="text" name="username" class="textinput"><br />
 
 	<div style="margin-top:16px">Password</div><input type="password" name="password" class="textinput"><br />
+	<?php 
+	if(isset($_SERVER['HTTP_REFERER'])){
+	echo '<input type="hidden" name="return" value="'.$_SERVER['HTTP_REFERER'].'" />';
+	}
+	?>
 	<input class='loginsubmit' type="submit" name="submit" value="Sign In" />
 </div>
 

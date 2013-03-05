@@ -175,13 +175,13 @@ $MatchImage = new TalkPHP_Gravatar();
 		<img style="position:absolute;right:0px;width:50%;height:353px" src="IS/fchamp.png"/>
 		<div style="z-index:9999;position:absolute;top:0;left:0"><img src="IS/VS.png" width='640px'/></div>
 		</div>
-
+<a href='bets.php'>New Match</a>
 		<div id='matchesBox'>
-	<?php
-	if($stmt = $mysqli->prepare("SELECT `ID`, `Input 1`, `Input 2`, `Mod`, `Timestamp` FROM `bets_matches` 
+		<?php
+	if($stmt = $mysqli->prepare("SELECT `ID`, `Input 1`, `Input 2`, `Mod`, `Timestamp`, `Event`, `Description` FROM `bets_matches` 
 	WHERE status = 'open' ORDER BY `ID` DESC LIMIT 10")) {
 	$stmt->execute();
-	$stmt->bind_result($matchNo, $name1, $name2, $mod, $timestamp);
+	$stmt->bind_result($matchNo, $name1, $name2, $mod, $timestamp, $event, $description);
 	
 	$resultset = Array();
 	while($stmt->fetch()) {
@@ -191,6 +191,8 @@ $MatchImage = new TalkPHP_Gravatar();
 			"Input2"=>$name2,
 			"Mod"=>$mod,
 			"Timestamp"=>$timestamp,
+			"Event"=>$event,
+			"Description"=>$description
 			);
 	}
 	
@@ -219,24 +221,25 @@ $MatchImage = new TalkPHP_Gravatar();
 			}
 			
 		} else {
-			$UserInfo = new UserInfo($result['Mod']);
-			/* using user email until gravatar field exists */
-			$email = $UserInfo->getEmail();
+			$MetaInfo = new UserMetaInfo($result['Mod']);
+			$email = $MetaInfo->getGravEmail();
 			$MatchImage->setEmail($email);
 			$MatchImage->setSize(45);
 			$imgURL = $MatchImage->getAvatar();	
+			$dscrpt = substr($result['Description'],0,40);//truncates the match description to fit in the box.
 			echo "
 			<a href='bets.php?mid=" . $result['ID'] . "'>
 			<div class='matchContainer'>
 				<div class='match'>
 				<img src='" . $imgURL . "' alt='pic' >
-				<div>Event Name Here</div>
+				<div>". $result['Event'] . "</div>
 				<div>" . $result['Input1'] . " vs " . $result['Input2'] . "</div>
+				<div>Mod: ". $result['Mod'] . "</div>
 				</div>
 				
 				<div class='matchInfo'>
-				<div>Mod: ". $result['Mod'] . "</div>
-				<div>Info: Info Goes Here</div>
+				<div>Created: ". date('j<\s\up>S</\s\up> F Y',strtotime($result['Timestamp'])) . "</div>
+				<div>Info: ". $dscrpt . "</div>
 				</div>
 			</div>
 			</a>";
@@ -285,9 +288,7 @@ foreach($resultset as $result) {
  $leadpoints = $result['leadpoints'];
  if (($lastpoints - $leadpoints) > 0) {$rank++;}
  if ($rank === 1) {$highest = $leadpoints;}
- $UserInfo = new UserInfo($leadname);
- $uid = $UserInfo->getUserID();
- $UserMeta = new UserMetaInfo($uid);
+ $UserMeta = new UserMetaInfo($leadname);
  $email = $UserMeta->getGravEmail();
  $MatchImage->setEmail($email);
  $MatchImage->setSize(50);

@@ -1,5 +1,5 @@
 <?php
 session_start();
 session_destroy();
-header('Location: ../players.php');
+header('Location: ../betmain.php');
 ?>

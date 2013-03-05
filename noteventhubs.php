@@ -6,11 +6,10 @@ if(!$_SESSION['loggedin']) {
 	header('Location: players.php');
 }
 $UserInfo = new UserInfo($_SESSION['name']);
-$uid = $UserInfo->getUserID();
 
 if($_SERVER['REQUEST_METHOD'] == 'POST') {	
 		if(!isset($errmsg)) {
-				updateProfile($uid, $_POST['gravemail'], $_POST['location'], $_POST['lat'], $_POST['long'], $_POST['GGPO'], $_POST['LIVE'], $_POST['PSN']);	
+				updateProfile($_SESSION['name'], $_POST['gravemail'], $_POST['location'], $_POST['lat'], $_POST['long'], $_POST['GGPO'], $_POST['LIVE'], $_POST['PSN']);	
 $_SESSION['email'] = $_POST['gravemail'];				
 		}
 }
@@ -97,7 +96,7 @@ $useravatar = new TalkPHP_Gravatar();
 $useravatar->setEmail($_SESSION['email']);
 $useravatar->setSize(80);
 $imgURL = $useravatar->getAvatar();
-$UserMeta = new UserMetaInfo($uid);
+$UserMeta = new UserMetaInfo($_SESSION['name']);
 ?>
 <div style='margin:auto;width:640px;'>
 <?php if(isset($errmsg)) echo "<div id='error'>" . $errmsg . "</div>"; ?>

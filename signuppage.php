@@ -1,7 +1,7 @@
 <?php
 session_start();
 if(isset($_SESSION['loggedin'])) {
-	header('Location: players.php');
+	header('Location: betmain.php');
 }
 
 require('PHP/connect.php');
@@ -17,8 +17,8 @@ if(array_key_exists('submit',$_POST)) {
 	$password = $_POST['password'];
 	$email = $_POST['email'];
 
-	if(preg_match("/^[A-Za-z0-9_-]{3,16}$/", $username) === 0) {
-		$erruser = "Username must be 3-16 characters long and only contain alphanumeric characters, '_' and '-'";
+	if(preg_match("/^[A-Za-z0-9:_-]{2,16}$/", $username) === 0) {
+		$erruser = "Username must be 2-16 characters long and only contain alphanumeric characters, '_' and '-' (and ':')";
 		$validated = false;
 	}
 	
@@ -84,9 +84,8 @@ if(array_key_exists('submit',$_POST)) {
 			echo "Execute failed: (" . $stmt->errno . ") " . $stmt->error;
 		}	
 		
-		$id = $stmt->insert_id;
 		if(($stmt = $mysqli->prepare("INSERT INTO user_meta (uid, gravemail) VALUES (?,?)"))) {
-			$stmt->bind_param("is", $id, $email);
+			$stmt->bind_param("ss", $username, $email);
 			$stmt->execute();
 		}	
 		
@@ -94,7 +93,7 @@ if(array_key_exists('submit',$_POST)) {
 		$_SESSION['name'] = $username;
 		$_SESSION['email'] = $email;
 		$_SESSION['level'] = "user";
-		header('Location:players.php');
+		header('Location:betmain.php');
 	}
 }
 ?>

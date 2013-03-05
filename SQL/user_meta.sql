@@ -3,8 +3,8 @@
 -- http://www.phpmyadmin.net
 --
 -- Host: localhost
--- Generation Time: Feb 08, 2013 at 12:48 PM
--- Server version: 5.5.28-cll
+-- Generation Time: Mar 05, 2013 at 05:24 AM
+-- Server version: 5.5.30-cll
 -- PHP Version: 5.2.17
 
 SET SQL_MODE="NO_AUTO_VALUE_ON_ZERO";
@@ -27,7 +27,7 @@ SET time_zone = "+00:00";
 --
 
 CREATE TABLE IF NOT EXISTS `user_meta` (
-  `uid` int(11) NOT NULL,
+  `uid` varchar(16) NOT NULL,
   `gravemail` varchar(50) NOT NULL,
   `location` varchar(16) NOT NULL,
   `lat` decimal(11,8) DEFAULT NULL,
@@ -35,6 +35,7 @@ CREATE TABLE IF NOT EXISTS `user_meta` (
   `GGPO` varchar(16) NOT NULL,
   `LIVE` varchar(16) NOT NULL,
   `PSN` varchar(16) NOT NULL,
+  PRIMARY KEY (`uid`),
   UNIQUE KEY `uid` (`uid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
@@ -43,11 +44,11 @@ CREATE TABLE IF NOT EXISTS `user_meta` (
 --
 
 INSERT INTO `user_meta` (`uid`, `gravemail`, `location`, `lat`, `long`, `GGPO`, `LIVE`, `PSN`) VALUES
-(1, 'stickystaines@gmail.com', '', NULL, NULL, '', '', ''),
-(2, '', '', NULL, NULL, '', '', ''),
-(5, 'furryforay@gmail.com', 'socal', 33.00000000, -117.00000000, '4a4a', 'AFTERBIRTH WOO', ''),
-(6, 'test', '', 0.00000000, 0.00000000, '', '', ''),
-(7, 'rick_danto@hotmail.com', '', NULL, NULL, '', '', '');
+('4a4a', 'furryforay@gmail.com', 'socal', 33.53202920, -117.70214800, '4a4a', 'AFTERBIRTH WOO', ''),
+('bobby', 'bobby@aol.com', 'Antarctica', -82.00000000, -135.00000000, '', '', ''),
+('dan', '', '', NULL, NULL, '', '', ''),
+('joe', 'stickystaines@gmail.com', '', 52.00000000, -1.00000000, '', '', ''),
+('SirRiCK', 'rick_danto@hotmail.com', 'Los Angeles', 36.00000000, -119.00000000, 'SirRiCK', 'RickDanto', 'RickDanto');
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;

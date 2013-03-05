@@ -32,7 +32,7 @@ function doesUserExist($username) {
 function updateProfile($uid, $gravemail, $location, $lat, $long, $GGPO, $LIVE, $PSN) {
 	global $mysqli;
 	if($stmt = $mysqli->prepare("REPLACE INTO `user_meta` (`uid`, `gravemail`, `location`, `lat`, `long`, `GGPO`, `LIVE`, `PSN`) VALUES (?,?,?,?,?,?,?,?)")) {
-		$stmt->bind_param("issiisss", $uid, $gravemail, $location, $lat, $long, $GGPO, $LIVE, $PSN);
+		$stmt->bind_param("sssddsss", $uid, $gravemail, $location, $lat, $long, $GGPO, $LIVE, $PSN);
 		$stmt->execute();
 	}
 }
@@ -53,11 +53,11 @@ function minusPoints($value, $user) {
 	}
 }
 
-function createMatch($input1, $input2, $user, $ip) {
+function createMatch($input1, $input2, $user, $ip, $event, $description, $featured, $img1, $img2) {
 	global $mysqli;
 	$matchID;
-	if($stmt = $mysqli->prepare("INSERT INTO bets_matches (`Input 1`, `Input 2`, `Mod`, `IP`) VALUES (?, ?, ?, ?)")) {
-		$stmt->bind_param("sssi", $input1, $input2, $user, $ip);
+	if($stmt = $mysqli->prepare("INSERT INTO bets_matches (`Input 1`, `Input 2`, `Mod`, `IP`, `Event`, `Description`, `isfeatured`, `img1`, `img2`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)")) {
+		$stmt->bind_param("sssisssss", $input1, $input2, $user, $ip, $event, $description, $featured, $img1, $img2);
 		$stmt->execute();
 		$matchID = $stmt->insert_id;
 	}
@@ -130,6 +130,11 @@ class MatchInfo {
 	private $Status;
 	private $Winner;
 	private $Timestamp;
+	private $Event;
+	private $Description;
+	private $isFeatured;
+	private $Img1;
+	private $Img2;
 	
 	function __construct($mid) {
 		$this->MatchID = $mid;
@@ -141,7 +146,7 @@ class MatchInfo {
 		if($stmt = $mysqli->prepare("SELECT * FROM bets_matches WHERE ID=?")) {
 			$stmt->bind_param("i", $this->MatchID);
 			$stmt->execute();
-			$stmt->bind_result($matchid, $input1, $input2, $mod, $modip, $status, $winner, $timestamp);
+			$stmt->bind_result($matchid, $input1, $input2, $mod, $modip, $status, $winner, $timestamp, $event, $description, $isfeatured, $img1, $img2);
 			$stmt->fetch();
 			
 			$this->MatchID = $matchid;
@@ -152,6 +157,11 @@ class MatchInfo {
 			$this->Status = $status;
 			$this->Winner = $winner;
 			$this->Timestamp = $timestamp;
+			$this->Event = $event;
+			$this->Description = $description;
+			$this->isFeatured = $isfeatured;
+			$this->Img1 = $img1;
+			$this->Img2 = $img2;
 		}
 	}
 	
@@ -163,6 +173,11 @@ class MatchInfo {
 	public function getStatus() { return $this->Status; }
 	public function getWinner() { return $this->Winner; }
 	public function getTimestamp() { return $this->Timestamp; }
+	public function getEvent() { return $this->Event; }
+	public function getDescription() { return $this->Description; }
+	public function getFeatured() { return $this->isFeatured; }
+	public function getImg1() { return $this->Img1; }
+	public function getImg2() { return $this->Img2; }
 }
 
 class BetInfo {
@@ -261,7 +276,7 @@ class UserMetaInfo {
 	private function getInfo() {
 		global $mysqli;
 		if($stmt = $mysqli->prepare("SELECT * FROM user_meta WHERE uid=?")) {
-			$stmt->bind_param("i", $this->UserID);
+			$stmt->bind_param("s", $this->UserID);
 			$stmt->execute();
 			$stmt->bind_result($this->UserID, $this->GravEmail, $this->Location, $this->Latitude,
 										$this->Longitude, $this->GGPO, $this->LIVE, $this->PSN);
