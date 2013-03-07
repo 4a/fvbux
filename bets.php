@@ -63,6 +63,89 @@ body
 {
   text-align:center;
 }  
+
+#form_head
+{
+background:url('IS/form_Head.gif') repeat-x;
+height:23px;
+width:100%;
+border-top-left-radius:5px;
+border-top-right-radius:5px;
+border-top:#9c8fd5 1px solid;
+}
+
+#form_mCreate
+{
+background:#070419 url('IS/form_BG.gif') repeat-x;
+border-bottom:#2700fc 1px solid;
+border-radius:5px;
+width:660px;
+margin:40px auto;
+}
+
+#form_mCreate input, textarea
+{
+color:#fff;
+font-weight:bold;
+font-family:arial;
+background:black;
+border:0px;
+border-radius:5px;
+text-align:center
+}
+
+.form_text
+{
+margin:10px;
+}
+
+.form_box
+{
+width:155px;
+height:22px;
+}
+
+.form_event
+{
+margin:5px auto auto auto;
+width:245px;
+height:32px;
+font-size:20px;
+}
+
+.form_description
+{
+margin:5px auto 15px auto;
+max-width:225px;
+min-width:225px;
+min-height:70px;
+text-align:left;
+padding:5px 10px;
+}
+
+.form_submit
+{
+margin:20px auto 40px auto;
+}
+
+.form_box:focus, .form_event:focus, .form_description:focus
+{
+outline: #2700fc auto;
+}
+
+::-webkit-input-placeholder { /* WebKit browsers */
+    color:    #5f5f5f;
+}
+:-moz-placeholder { /* Mozilla Firefox 4 to 18 */
+    color:    #5f5f5f;
+}
+::-moz-placeholder { /* Mozilla Firefox 19+ */
+    color:    #5f5f5f;
+}
+:-ms-input-placeholder { /* Internet Explorer 10+ */
+    color:    #5f5f5f;
+}
+
 </style>
 </head>
 <body>
@@ -222,19 +305,34 @@ if(isset($_SESSION['loggedin'])) {
 /* Moderate and Create Match Form - No match ID (mid) is set */
 	else {
 		echo "
-		This is the submission form for creating and moderating a match-up.
-		<br>As the moderator, you cannot bet on an outcome.
-		<br>You will have the opportunity to earn fvbux based on the amount of people who have participated in your match-up.
+		<div id='form_mCreate'>
+		<div id='form_head'></div>
+		<div class='form_text'>
+		This is the submission form for creating and moderating a matchup.
+		<br>As a moderator, you cannot bet on an outcome.
+		<br>You will have the opportunity to earn fvbux based on the amount of people who have participated in your matchup.
+		</div>
 		<form action='$_SERVER[PHP_SELF]' method='post'>
-		input1: <input type='text' name='input1'>
-		<br>VS<br>
-		input2: <input type='text' name='input2'><br>
-		event: <input type='text' name='event'><br>
-		description: <textarea wrap='physical' name='description'></textarea><br>
-		featured?: <input class='featured' type='checkbox' name='featured' title='Images are required for featured matches.'><br>
-		img1: <input type='text' name='img1'><br>
-		img2: <input type='text' name='img2'><br>
-		<input type='submit' name='submit' value='Submit'/>";
+		
+		<div>
+		<input class='form_event' type='text' name='event' placeholder='EVENT TITLE'><br>
+		<textarea class='form_description' wrap='physical' name='description' placeholder='Description'></textarea><br>
+		</div>
+		
+		<div>
+		<input class='form_box' style='position:relative;bottom:30px;right:15px' type='text' name='input1' placeholder='SCRUBLORD 1'>
+		<img src='IS/VS2.png' alt='VS'/>
+		<input class='form_box' style='position:relative;bottom:30px;left:15px' type='text' name='input2' placeholder='SCRUBLORD 2'><br>
+		</div>
+		
+		<div style='font-size:15px'>
+		<input class='form_box' style='position:relative;right:15px' type='text' name='img1' placeholder='Paste Image URL Here'>
+		Featured?<input class='featured' type='checkbox' name='featured' title='Your matchup will be featured on the front page. Two images are required for featured matches.'>
+		<input class='form_box' style='position:relative;left:15px' type='text' name='img2' placeholder='Paste Image URL Here'><br>
+		</div>
+		
+		<input class='form_submit' type='image' src='IS/submit.png' name='submit' value='Submit'/>
+		</div>";
 	}
 }
 
