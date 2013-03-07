@@ -4,8 +4,6 @@ require('PHP/functionlist.php');
 
 $IP = $_SERVER['REMOTE_ADDR'];
 $IP = ip2long($IP);
-/* $IPBYPASS is used to get around the ip check so you are able to test bet creation locally */
-$IPBYPASS = FALSE;
 
 if(isset($_SESSION['loggedin'])) {
 	$totalpoints = getPoints($_SESSION['name']);
@@ -66,7 +64,7 @@ body
 
 #form_head
 {
-background:url('IS/form_Head.gif') repeat-x;
+background:url('IS/form_head.gif') repeat-x;
 height:23px;
 width:100%;
 border-top-left-radius:5px;
@@ -76,7 +74,7 @@ border-top:#9c8fd5 1px solid;
 
 #form_mCreate
 {
-background:#070419 url('IS/form_BG.gif') repeat-x;
+background:#070419 url('IS/form_BG.gif') repeat-x 0px 0px;
 border-bottom:#2700fc 1px solid;
 border-radius:5px;
 width:660px;
@@ -315,20 +313,20 @@ if(isset($_SESSION['loggedin'])) {
 		<form action='$_SERVER[PHP_SELF]' method='post'>
 		
 		<div>
-		<input class='form_event' type='text' name='event' placeholder='EVENT TITLE'><br>
-		<textarea class='form_description' wrap='physical' name='description' placeholder='Description'></textarea><br>
+		<input class='form_event' type='text' name='event' placeholder='EVENT TITLE' autocomplete='off'><br>
+		<textarea class='form_description' wrap='physical' name='description' placeholder='Description' autocomplete='off'></textarea><br>
 		</div>
 		
 		<div>
-		<input class='form_box' style='position:relative;bottom:30px;right:15px' type='text' name='input1' placeholder='SCRUBLORD 1'>
+		<input class='form_box' style='position:relative;bottom:30px;right:15px' type='text' name='input1' placeholder='SCRUBLORD 1' autocomplete='off'>
 		<img src='IS/VS2.png' alt='VS'/>
-		<input class='form_box' style='position:relative;bottom:30px;left:15px' type='text' name='input2' placeholder='SCRUBLORD 2'><br>
+		<input class='form_box' style='position:relative;bottom:30px;left:15px' type='text' name='input2' placeholder='SCRUBLORD 2' autocomplete='off'><br>
 		</div>
 		
 		<div style='font-size:15px'>
-		<input class='form_box' style='position:relative;right:15px' type='text' name='img1' placeholder='Paste Image URL Here'>
+		<input class='form_box' style='position:relative;right:15px' type='text' name='img1' placeholder='Paste Image URL Here' autocomplete='off'>
 		Featured?<input class='featured' type='checkbox' name='featured' title='Your matchup will be featured on the front page. Two images are required for featured matches.'>
-		<input class='form_box' style='position:relative;left:15px' type='text' name='img2' placeholder='Paste Image URL Here'><br>
+		<input class='form_box' style='position:relative;left:15px' type='text' name='img2' placeholder='Paste Image URL Here' autocomplete='off'><br>
 		</div>
 		
 		<input class='form_submit' type='image' src='IS/submit.png' name='submit' value='Submit'/>

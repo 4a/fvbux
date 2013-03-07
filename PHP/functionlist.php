@@ -1,6 +1,9 @@
 <?php
 require('connect.php');
 
+/* $IPBYPASS is used to get around the ip check so you are able to test bet creation locally */
+$IPBYPASS = TRUE;
+
 function getPoints($user) {
 	global $mysqli;
 	

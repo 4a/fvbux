@@ -25,8 +25,12 @@ $BetInfo = new BetInfo($_GET['bid']);
                 
                 if ($user1choice === $input1) {
                   $user2choice = $input2;
+				  $user1img = $Match->getImg1();
+				  $user2img = $Match->getImg2();
                 } else {
                   $user2choice = $input1;
+				  $user1img = $Match->getImg2();
+				  $user2img = $Match->getImg1();
                 }
 
                 if(isset($_SESSION['loggedin'])) {
@@ -57,9 +61,76 @@ $status = challengeBet($betid, $user2, $betvalue);
 <link rel="stylesheet" type="text/css" href="CSS/newfightans.css">
 <link rel="stylesheet" type="text/css" href="CSS/tempstyles.css">
 <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js" type="text/javascript"></script>
+<script type="text/javascript" src="JS/jquery.zclip.js"></script>
 <style>
 body{
 text-align:center;
+}
+
+#share
+{
+width:410px;
+min-height:285px;
+margin:40px auto;
+background:#090b75 url('IS/share_bg.gif') repeat-x;
+border-radius:5px;
+border-top:1px solid #6d93f6;
+}
+
+input#url
+{
+height:27px;
+width:260px;
+padding:0px;
+border:0px;
+background:url('IS/url_sprite.gif');
+text-align:left;
+padding:0px 10px 0px 10px;
+margin: auto 0px 10px;
+color:#112683;
+}
+
+#zclip_button
+{
+height:25px;
+width:25px;
+background:url('IS/copy_sprite.gif');
+display:inline-block;
+position:relative;
+top:9px;
+border-top:1px solid #afd0f9;
+border-bottom:1px solid #1824ae;
+border-top-left-radius:5px;
+border-bottom-left-radius:5px;
+}
+
+.pb_amount
+{
+font-size:30px;
+font-weight:bold;
+margin:22px auto 10px;
+text-shadow: 0px 3px 2px rgba(0, 0, 0, .5);
+}
+
+.pb_choice
+{
+background:url('IS/choice_bg.gif') repeat-x;
+font-size:35px;
+font-weight:bold;
+height:75px;
+line-height:75px;
+width:300px;
+margin:auto;
+-webkit-box-shadow: 0px 5px 5px rgba(0, 0, 0, 0.2);
+-moz-box-shadow:    0px 5px 5px rgba(0, 0, 0, 0.2);
+box-shadow:         0px 5px 5px rgba(0, 0, 0, 0.2);
+}
+
+.pb_choice img
+{
+width:68px;
+height:75px;
+float:left;
 }
 </style>
 </head>
@@ -71,7 +142,6 @@ include 'user.php';
 ?>
 
 <?php
-$IPBYPASS = TRUE;
 if(isset($_SESSION['loggedin']))
 {
 
@@ -89,14 +159,42 @@ if(isset($_SESSION['loggedin']))
 
   else if ($user1 === $_SESSION['name'])
   {
-   echo "You have bet " . $betvalue . " on " . $user1choice;
+   echo "<div id='share'>";
+   echo "<div class='pb_amount'>You have bet <span class='fvbux'>$</span>" . $betvalue . " on</div>";
+   echo "<div class='pb_choice'>";
+   if(!empty($user1img)){echo "<img src='". $user1img ."'/>";}
+   echo $user1choice ."</div>";
    echo "<br>No one has bet against you yet.<br>";
-   echo "Share URL: <input name='share_url' value='" . $shareurl . "'>";
+   echo "Share URL <div id='zclip_button' href='#'></div>"; 
+   echo "<input id='url' name='share_url' value='" . $shareurl . "' readonly onClick='this.select()'/>";
+   echo "<div id='success' class='hidden'>Copied to clipboard</div>";	
+   echo "<script type='text/javascript'>
+	$(document).ready(function(){
+    $('#zclip_button').zclip({
+        path:'JS/ZeroClipboard.swf',
+		copy:$('input#url').val(),
+        beforeCopy:function(){
+            $('input#url').css('background-position','0px 27px');
+            $(this).css('background-position','0px 25px');
+			$(this).css('border-bottom','1px solid #afd0f9');
+			$(this).css('border-top','1px solid #1824ae');
+			$('#success').hide();
+        },
+        afterCopy:function(){
+            $('input#url').css('background-position','0px 0px');
+            $(this).css('background-position','0px 0px');
+			$(this).css('border-top','1px solid #afd0f9');
+			$(this).css('border-bottom','1px solid #1824ae');
+            $('#success').fadeIn(1000);
+        }
+    });
+	});
+</script>";
    echo "<br /><br /><form action='cancelbet.php' method='POST'>
 			<input type='hidden' name='betid' value='" . $_GET['bid'] . "'>
 			<input type='image' src='IS/tick.png' name='submit'>
-			</form>";
-	echo "<br />(REPLACE TICK WITH PROPER 'CANCEL BET' IMAGE OR SOMETHING)";
+			</form>";		
+   echo "</div>";
   }
 
   else if ($totalpoints < $betvalue)

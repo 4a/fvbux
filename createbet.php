@@ -22,7 +22,6 @@ TODO:
 
 $IP = $_SERVER['REMOTE_ADDR'];
 $IP = ip2long($IP);
-$IPBYPASS = TRUE;
 
 if(array_key_exists('submit',$_POST)) {
 	$username = $_SESSION['name'];
@@ -60,35 +59,91 @@ if(array_key_exists('submit',$_POST)) {
 <link rel="stylesheet" type="text/css" href="CSS/tempstyles.css">
 <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js" type="text/javascript"></script>
 <style>
+
 .bettingslip
 {
-	margin-top:40px;
-	margin-bottom:150px;
-	font-family: Tahoma, Geneva, sans-serif;
-	text-shadow: 0 0 1px rgba(0,0,0,0.3);
-}  
-
-.editbox
-{
-	text-align:left;
-	position:relative;
-	width:440px;
-	margin:auto;
-	background:#1a4ae0;
-	border:0px solid #fff;
-	padding:37px;
-	padding-top:0px;
-	padding-bottom: 10px;
-	box-shadow: 0 0 10px rgba(0,0,0,0.3);
+background:#0c0c70 url('IS/slip_bg.gif') repeat-x;
+width:410px;
+min-height:570px;
+margin:40px auto 100px;
+border-radius:5px;
+border-top:1px solid #6d93f6;
+font-family: 'Helvetica', sans-serif;
 }
 
 .slipTitle
 {
-color:white;
-font-size:6em;
+height:75px;
+line-height:75px;
 text-align:center;
-min-height:100px;
-padding:20px 0px 20px 0px;
+font-size:30px;
+font-weight:bold;
+text-shadow: 0px 3px 2px rgba(0, 0, 0, .5);
+}
+
+.editbox
+{
+width:355px;
+min-height:388px;
+margin:0px auto;
+background:#adb1fb url('IS/slip_white.gif') repeat-x;
+border-radius:5px;
+border-bottom:1px solid #675bff;
+}
+
+.tophead
+{
+border-top-left-radius:5px;
+border-top-right-radius:5px;
+}
+
+.sliphead
+{
+background:#2528cf url('IS/slip_head.gif') repeat-x;
+height:30px;
+border-top:1px solid #a3d5f0;
+border-bottom:1px solid #2528cf;
+text-align:center;
+font-size:25px;
+font-weight:bold;
+-webkit-box-shadow: 0px 5px 5px rgba(0, 0, 0, 0.2);
+-moz-box-shadow:    0px 5px 5px rgba(0, 0, 0, 0.2);
+box-shadow:         0px 5px 5px rgba(0, 0, 0, 0.2);
+}
+
+#choiceContainer
+{
+margin:10px auto;
+}
+
+.slipchoice
+{
+background:url('IS/choice_bg.gif') repeat-x;
+font-size:30px;
+font-weight:bold;
+text-align:center;
+height:75px;
+line-height:75px;
+width:300px;
+margin:5px auto;
+-webkit-box-shadow: 0px 5px 5px rgba(0, 0, 0, 0.2);
+-moz-box-shadow:    0px 5px 5px rgba(0, 0, 0, 0.2);
+box-shadow:         0px 5px 5px rgba(0, 0, 0, 0.2);
+}
+
+.slipchoice img
+{
+width:68px;
+height:75px;
+float:left;
+}
+
+.radioContainer {
+	min-width: 70px;
+	width: 55px;
+	height:46px;
+	border:0px;
+	float: right;
 }
 
 input[type="radio"] {
@@ -98,85 +153,21 @@ input[type="radio"] {
 input[type="radio"] + label span {
 	vertical-align: middle;
 	display:inline-block;
-	width: 70px;
+	width: 55px;
 	height: 55px;
-	background: url(IS/radio-sheet.png) -50px top no-repeat;
+	background: white url(IS/radio-sheet.png) -50px top no-repeat;
 	cursor: pointer;
 }
 
 input[type="radio"]:checked + label span {
-	background: url(IS/radio-sheet.png) left top no-repeat;
+	background: white url(IS/radio-sheet.png) left top no-repeat;
 }
 
-.slipColumn {
-	height: 50px;
-	background: #7dacec;
-}
-
-.slipColumn .playerName {
-	text-align: center;
-	height: 100%;
-	color: #0c69ce;
-	font-size: 2.1em;
-	line-height:50px;
-	overflow: hidden;
-}
-
-.slipHeader {
-	text-align: center;
-	height: 100%;
-	color: #000;
-	font-size: 2.8em;
-	line-height:50px;
-	overflow: hidden;
-}
-
-.slipColumn .radioContainer {
-	min-width: 70px;
-	width: 70px;
-	height:46px;
-	border:2px #7dacec solid;
-	float: right;
-	background-color: white;
-}
-
-.valueContainer {
-	height: 40px;
-	margin-top: 20px;
-	margin-bottom: 20px;
-}
-
-.valueContainer .valueName {
-	text-align: left;
-	height: 100%;
-	font-size: 2.2em;
-	font-style: bold;
-	padding-left: 25px;
-	line-height: 40px;
-}
-
-.valueContainer .valueInput {
-	float: right;
-	height: 100%;
-	font-size: 2.2em;
-	font-style: bold;
-	line-height: 45px;
-}
-.valueInput input {
-	top:-3px;
-	height:30px;
-	width:200px;
-	font-size:20px;
-	line-height:20px;
-	text-align:right;
-	position:relative;
-	border: 2px #7dacec solid;
-}
-.private
+.valueContainer
 {
-display:inline-block;
-width:100px;
+margin:20px auto;
 }
+
 </style>
 </head>
 <body>
@@ -192,54 +183,60 @@ if(isset($errmsg)) {
 $Match = new MatchInfo($match_ID);
 $input1 = $Match->getInput1();
 $input2 = $Match->getInput2();
+$event = $Match->getEvent();
+$description = $Match->getDescription();
+$img1 = $Match->getImg1();
+$img2 = $Match->getImg2();
 
 if($Match->getMod() != $_SESSION['name'] && $IP != $Match->getModIP() || $IPBYPASS) {
 	echo "
 <div class='bettingslip'>
+<form id='createbet' action='$_SERVER[PHP_SELF]?mid=".$match_ID."' method='POST' 
+onsubmit=\"return confirm('You are betting ' + $('input[name=betamount]', '#createbet').val() + ' FV Bux on ' + $('input[name=winner]:checked', '#createbet').val() + '. Is this correct?')\">
+
+	<div class='slipTitle'>SPAGHETTI SHOWDOWN</div>
 	<div class='editbox'>
-		<div class='slipTitle'>
-		FV Title Here
+		
+		<div class='sliphead tophead'>Event</div>
+		<div style='min-height:8px;padding:10px;color:#100875;font-weight:bold'>
+		". $event ."
 		</div>
-		<div class='slipColumn'>
-			<div class='slipHeader'>Event</div>
+		
+		<div class='sliphead'>Information</div>
+		<div style='min-height:68px;padding:10px;color:#100875;font-weight:bold'>
+		". nl2br($description) ."
+		<br><br><div style='text-align:right;font-weight:bold'>Moderator: ". $Match->getMod() ."</div>
 		</div>
-		<div style='background:white;color:black;min-height:55px'>
-		Evolution
-		</div>
-		<div class='slipColumn'>
-			<div class='slipHeader'>Information</div>
-		</div>
-		<div style='background:white;color:black;min-height:240px'>
-		Grand Finals<br>
-		3/5 set<br/>
-		Moderator: ". $Match->getMod() ."
-		</div>
-		<div class='slipColumn'>
-			<div class='slipHeader'>Choose Winner</div>
-		</div>
-		<div style='background:white;height:15px'></div>
-		<form action='$_SERVER[PHP_SELF]?mid=".$match_ID."' method='POST'>
-		<div class='slipColumn'>
+		
+		<div class='sliphead'>Choose Winner</div>
+		
+		<div id='choiceContainer'>
+		<div class='slipchoice'>";
+		if(!empty($img1)){echo "<img src='". $img1 ."'/>";}
+		echo "
 			<div class='radioContainer'><input type='radio' id='r1' name='winner' value='".$input1."'/>
-			<label for='r1'><span></span></label></div>
+			<label for='r1'><span></span></label>
+			</div>
 			<div class='playerName'>".$input1."</div>
 		</div>
-		<div style='background:white;height:3px'></div>
-		<div class='slipColumn'>
+		<div></div>
+		<div class='slipchoice'>";
+		if(!empty($img2)){echo "<img src='". $img2 ."'/>";}
+		echo "
 			<div class='radioContainer'><input type='radio' id='r2' name='winner' value='".$input2."'/>
-			<label for='r2'><span></span></label></div>
+			<label for='r2'><span></span></label>
+			</div>
 			<div class='playerName'>".$input2."</div>
-		</div>	
-		<div class='valueContainer'>
-			<div class='valueInput'><span class='fvbux'>$ </span><input type='text' name='betamount' /></div>
-			<div class='valueName'>Bet Amount</div>
 		</div>
-		Private? <input type='checkbox' name='private'><br/>
-		(Note: Private only means that your bet wont show publicly on the website.)<br />
-	</div>
-			<input type='submit' name='submit'>
-	</form>
+		</div>
+	</div>		
+	<div class='valueContainer'>Bet Amount<span class='fvbux'>$ </span><input type='text' name='betamount' /></div>
+	
+	Private? <input type='checkbox' name='private'><br/>
+	(Note: Private only means that your bet wont show publicly on the website.)<br />		
 </div>
+<input type='image' src='IS/submit.png' name='submit' value='Submit' />
+</form>	
     ";
 } else {
 	echo "<br /> <br />You are the moderator ya cunt";
