@@ -1,47 +1,52 @@
 <?php
 session_start();
 require('PHP/functionlist.php');
-if(!isset($_SESSION['loggedin'])) {
-	header('Location: signinpage.php');
-}
 
 if(!isset($_GET['mid']) or empty($_GET['mid'])) {
-	header('Location: players.php');
+	header('Location: betmain.php');
 	exit();
 } else {
 	$match_ID = $_GET['mid'];
 }
 
-/*
-bet validation & creation
-TODO:
-1: check users bet amount and see if he has enough
-2. create bet and take bet amount from users points (should be done in the createbet function?)
-3. create a GET filled link that they can give to other people
-*/
-
 $IP = $_SERVER['REMOTE_ADDR'];
 $IP = ip2long($IP);
 
+$Match = new MatchInfo($match_ID);
+$input1 = $Match->getInput1();
+$input2 = $Match->getInput2();
+$event = $Match->getEvent();
+$description = $Match->getDescription();
+$img1 = $Match->getImg1();
+$img2 = $Match->getImg2();
+
 if(array_key_exists('submit',$_POST)) {
-	$username = $_SESSION['name'];
-	$totalpoints = getpoints($username);
 	$betamount = $_POST['betamount'];
 	$private = isset($_POST['private']) ? 1 : 0;
 	if(isset($_POST['winner'])) {
 		$user1choice = $_POST['winner'];
+		if( !(($user1choice === $input1) || ($user1choice === $input2)) ) {
+		//cheating prevention: if choice submitted isn't a real choice (radio value is editable with stuff like chrome's element inspector)
+		$errmsg = "Stop that!";
+		}
 	} else {
 		$errmsg = "You didn't pick a choice to win";
 	}
-	
 	if((!preg_match('/^\d+$/', $betamount)) || empty($betamount)) {
-		$errmsg = "Bet amount entered is not a numeric value or is empty";
+		$errmsg = "Bet amount entered is not an integer or is empty.";
 	}
-	
-	if($betamount > $totalpoints) {
-		$errmsg = "You're too poor to do that.";
+	if(!isset($_SESSION['loggedin'])) {
+		$errmsg = "You need to be <a href='signinpage.php'>logged in</a> to do that.";
+	} else {
+		$username = $_SESSION['name'];
+		$totalpoints = getpoints($username);
+		if($betamount > $totalpoints) {
+			$errmsg = "You're too poor to do that.";
+		}
+		if($username === $Match->getMod() || ($IP = $Match->getModIP() && !$IPBYPASS)) {
+			$errmsg = "You are the moderator ya cunt!";
+		}
 	}
-
 	if(!isset($errmsg)) {
 		$betID = createBet($match_ID, $username, $betamount, $IP, $private, $user1choice);
 		//create new page (new php page?) so the user can pass around the link and we can link to it publicly
@@ -60,18 +65,35 @@ if(array_key_exists('submit',$_POST)) {
 <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js" type="text/javascript"></script>
 <style>
 
-.bettingslip
+#createbet
 {
-background:#0c0c70 url('IS/slip_bg.gif') repeat-x;
 width:410px;
+margin:40px auto;
+text-align:right;
+}
+
+#slip_container
+{
+/* Fallback */
+background:#090b75 url('IS/slip_bg.gif') repeat-x;
+/* Safari 4-5, Chrome 1-9 */
+	background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#090b75), to(#1b47e4));
+/* Safari 5.1, Chrome 10+ */
+	background: -webkit-linear-gradient(top, #1b47e4, #090b75);
+/* Firefox 3.6+ */
+	background: -moz-linear-gradient(top, #1b47e4, #090b75);
+/* IE 10 */
+	background: -ms-linear-gradient(top, #1b47e4, #090b75);
+/* Opera 11.10+ */
+	background: -o-linear-gradient(top, #1b47e4, #090b75);
 min-height:570px;
-margin:40px auto 100px;
 border-radius:5px;
 border-top:1px solid #6d93f6;
 font-family: 'Helvetica', sans-serif;
+text-align:left;
 }
 
-.slipTitle
+.slip_title
 {
 height:75px;
 line-height:75px;
@@ -81,25 +103,47 @@ font-weight:bold;
 text-shadow: 0px 3px 2px rgba(0, 0, 0, .5);
 }
 
-.editbox
+.slip_editbox
 {
 width:355px;
 min-height:388px;
 margin:0px auto;
-background:#adb1fb url('IS/slip_white.gif') repeat-x;
+/* Fallback */
+background:#aeb1fb url('IS/slip_white.gif') repeat-x;
+/* Safari 4-5, Chrome 1-9 */
+	background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#aeb1fb), to(#fff));
+/* Safari 5.1, Chrome 10+ */
+	background: -webkit-linear-gradient(top, #fff, #aeb1fb);
+/* Firefox 3.6+ */
+	background: -moz-linear-gradient(top, #fff, #aeb1fb);
+/* IE 10 */
+	background: -ms-linear-gradient(top, #fff, #aeb1fb);
+/* Opera 11.10+ */
+	background: -o-linear-gradient(top, #fff, #aeb1fb);
 border-radius:5px;
 border-bottom:1px solid #675bff;
 }
 
-.tophead
+.slip_top
 {
 border-top-left-radius:5px;
 border-top-right-radius:5px;
 }
 
-.sliphead
+.slip_head
 {
+/* Fallback */
 background:#2528cf url('IS/slip_head.gif') repeat-x;
+/* Safari 4-5, Chrome 1-9 */
+	background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#4756d0), to(#83aae6));
+/* Safari 5.1, Chrome 10+ */
+	background: -webkit-linear-gradient(top, #83aae6, #4756d0);
+/* Firefox 3.6+ */
+	background: -moz-linear-gradient(top, #83aae6, #4756d0);
+/* IE 10 */
+	background: -ms-linear-gradient(top, #83aae6, #4756d0);
+/* Opera 11.10+ */
+	background: -o-linear-gradient(top, #83aae6, #4756d0);
 height:30px;
 border-top:1px solid #a3d5f0;
 border-bottom:1px solid #2528cf;
@@ -111,37 +155,82 @@ font-weight:bold;
 box-shadow:         0px 5px 5px rgba(0, 0, 0, 0.2);
 }
 
-#choiceContainer
+.slip_white
+{
+padding:10px;
+color:#100875;
+font-weight:bold;
+}
+
+.slip_event
+{
+min-height:8px;
+}
+
+.slip_info
+{
+min-height:68px;
+}
+
+.slip_mod
+{
+text-align:right;
+font-weight:bold;
+}
+
+#choice_container
 {
 margin:10px auto;
 }
 
-.slipchoice
+.slip_choice
 {
-background:url('IS/choice_bg.gif') repeat-x;
-font-size:30px;
-font-weight:bold;
+/* Fallback */
+background:#3d4fcd url('IS/choice_bg.gif') repeat-x;
+/* Safari 4-5, Chrome 1-9 */
+	background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#3d4fcd), to(#7daaed));
+/* Safari 5.1, Chrome 10+ */
+	background: -webkit-linear-gradient(top, #7daaed, #3d4fcd);
+/* Firefox 3.6+ */
+	background: -moz-linear-gradient(top, #7daaed, #3d4fcd);
+/* IE 10 */
+	background: -ms-linear-gradient(top, #7daaed, #3d4fcd);
+/* Opera 11.10+ */
+	background: -o-linear-gradient(top, #7daaed, #3d4fcd);
 text-align:center;
-height:75px;
-line-height:75px;
+min-height:75px;
 width:300px;
 margin:5px auto;
 -webkit-box-shadow: 0px 5px 5px rgba(0, 0, 0, 0.2);
 -moz-box-shadow:    0px 5px 5px rgba(0, 0, 0, 0.2);
 box-shadow:         0px 5px 5px rgba(0, 0, 0, 0.2);
+border-top:1px solid #aecffc;
+border-bottom:1px solid #262acb;
 }
 
-.slipchoice img
+.slip_choice p
+{
+font-size:25px;
+font-weight:bold;
+display:table-cell;
+vertical-align: middle;
+text-align:center;
+height:75px;
+width:160px;
+overflow:hidden;
+}
+
+.slip_choice img
 {
 width:68px;
 height:75px;
 float:left;
 }
 
-.radioContainer {
-	min-width: 70px;
-	width: 55px;
-	height:46px;
+.slip_radiocontainer {
+	margin:10px 10px 10px 0px;
+	width: 58px;
+	height:58px;
 	border:0px;
 	float: right;
 }
@@ -153,21 +242,60 @@ input[type="radio"] {
 input[type="radio"] + label span {
 	vertical-align: middle;
 	display:inline-block;
-	width: 55px;
-	height: 55px;
-	background: white url(IS/radio-sheet.png) -50px top no-repeat;
+	width: 58px;
+	height: 58px;
+	background: white url(IS/radio-sheet.gif) -58px top no-repeat;
 	cursor: pointer;
 }
 
 input[type="radio"]:checked + label span {
-	background: white url(IS/radio-sheet.png) left top no-repeat;
+	background: white url(IS/radio-sheet.gif) 0px top no-repeat;
 }
 
-.valueContainer
+.slip_valuecontainer
 {
+width:355px;
 margin:20px auto;
 }
 
+.slip_valuecontainer img
+{
+float:left;
+}
+
+.slip_valuecontainer input
+{
+float:right;
+margin:4px;
+border:2px solid #5e7add;
+height:29px;
+width:128px;
+/* Fallback */
+background:url('IS/slip_white.gif') repeat-x 50px;
+/* Safari 4-5, Chrome 1-9 */
+	background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#aeb1fb), to(#fff));
+/* Safari 5.1, Chrome 10+ */
+	background: -webkit-linear-gradient(top, #fff, #aeb1fb);
+/* Firefox 3.6+ */
+	background: -moz-linear-gradient(top, #fff, #aeb1fb);
+/* IE 10 */
+	background: -ms-linear-gradient(top, #fff, #aeb1fb);
+/* Opera 11.10+ */
+	background: -o-linear-gradient(top, #fff, #aeb1fb);
+color:#0d0c81;
+font-size:25px;
+font-weight:bold;
+line-height:25px;
+text-align:center;
+}
+
+.slip_private
+{
+margin:auto;
+padding-bottom:20px;
+clear:left;
+width:355px;
+}
 </style>
 </head>
 <body>
@@ -178,70 +306,54 @@ include 'user.php';
 
 <?php
 if(isset($errmsg)) {
-	echo "<div style='color:red'>" . $errmsg . "</div>";
+	echo "<div class='error'>" . $errmsg . "</div>";
 }
-$Match = new MatchInfo($match_ID);
-$input1 = $Match->getInput1();
-$input2 = $Match->getInput2();
-$event = $Match->getEvent();
-$description = $Match->getDescription();
-$img1 = $Match->getImg1();
-$img2 = $Match->getImg2();
+?>
+<form id='createbet' action='<?php echo $_SERVER['PHP_SELF'] ."?mid=". $match_ID; ?>' method='POST' 
+onsubmit="return confirm('You are betting ' + $('input[name=betamount]', '#createbet').val() + ' FV Bux on ' + $('input[name=winner]:checked', '#createbet').val() + '.\nIs this correct?')">
 
-if($Match->getMod() != $_SESSION['name'] && $IP != $Match->getModIP() || $IPBYPASS) {
-	echo "
-<div class='bettingslip'>
-<form id='createbet' action='$_SERVER[PHP_SELF]?mid=".$match_ID."' method='POST' 
-onsubmit=\"return confirm('You are betting ' + $('input[name=betamount]', '#createbet').val() + ' FV Bux on ' + $('input[name=winner]:checked', '#createbet').val() + '. Is this correct?')\">
-
-	<div class='slipTitle'>SPAGHETTI SHOWDOWN</div>
-	<div class='editbox'>
+<div id='slip_container'>
+	<div class='slip_title'>SPAGHETTI SHOWDOWN</div>
+	<div class='slip_editbox'>
 		
-		<div class='sliphead tophead'>Event</div>
-		<div style='min-height:8px;padding:10px;color:#100875;font-weight:bold'>
-		". $event ."
+		<div class='slip_head slip_top'>Event</div>
+		<div class='slip_white slip_event'>
+		<?php echo $event; ?>
 		</div>
 		
-		<div class='sliphead'>Information</div>
-		<div style='min-height:68px;padding:10px;color:#100875;font-weight:bold'>
-		". nl2br($description) ."
-		<br><br><div style='text-align:right;font-weight:bold'>Moderator: ". $Match->getMod() ."</div>
+		<div class='slip_head'>Information</div>
+		<div class='slip_white slip_info'>
+		<?php echo nl2br($description); ?>
+		<br><br><div class='slip_mod'>Moderator: <a href='players.php?user=<?php echo $Match->getMod(); ?>'><?php echo $Match->getMod(); ?></a></div>
 		</div>
 		
-		<div class='sliphead'>Choose Winner</div>
+		<div class='slip_head'>Choose Winner</div>
 		
-		<div id='choiceContainer'>
-		<div class='slipchoice'>";
-		if(!empty($img1)){echo "<img src='". $img1 ."'/>";}
-		echo "
-			<div class='radioContainer'><input type='radio' id='r1' name='winner' value='".$input1."'/>
+		<div id='choice_container'>
+		<div class='slip_choice'>
+		<?php if(!empty($img1)){echo "<img src='". $img1 ."' alt='". $input1 ."'/>";} ?>
+			<div class='slip_radiocontainer'><input type='radio' id='r1' name='winner' value='<?php echo $input1; ?>'/>
 			<label for='r1'><span></span></label>
 			</div>
-			<div class='playerName'>".$input1."</div>
+			<p><?php echo $input1 ?></p>
 		</div>
 		<div></div>
-		<div class='slipchoice'>";
-		if(!empty($img2)){echo "<img src='". $img2 ."'/>";}
-		echo "
-			<div class='radioContainer'><input type='radio' id='r2' name='winner' value='".$input2."'/>
+		<div class='slip_choice'>
+		<?php if(!empty($img2)){echo "<img src='". $img2 ."' alt='". $input2 ."'/>";} ?>
+			<div class='slip_radiocontainer'><input type='radio' id='r2' name='winner' value='<?php echo $input2; ?>'/>
 			<label for='r2'><span></span></label>
 			</div>
-			<div class='playerName'>".$input2."</div>
+			<p><?php echo $input2 ?></p>
 		</div>
 		</div>
 	</div>		
-	<div class='valueContainer'>Bet Amount<span class='fvbux'>$ </span><input type='text' name='betamount' /></div>
-	
-	Private? <input type='checkbox' name='private'><br/>
-	(Note: Private only means that your bet wont show publicly on the website.)<br />		
+	<div class='slip_valuecontainer'><img src='IS/slip_amount.png' alt='Bet Amount'/><input type='text' name='betamount' />
+	</div>
+	<div class='slip_private'>Private? <input type='checkbox' name='private'>
+	<br>(Your bet will be unlisted but it may still be challenged by anyone)</div>		
 </div>
-<input type='image' src='IS/submit.png' name='submit' value='Submit' />
+<input type='image' src='IS/submit.png' name='submit' alt='Submit' />
 </form>	
-    ";
-} else {
-	echo "<br /> <br />You are the moderator ya cunt";
-}
-?>
+
 </body>
-</head>
 </html>

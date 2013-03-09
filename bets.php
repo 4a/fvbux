@@ -5,9 +5,6 @@ require('PHP/functionlist.php');
 $IP = $_SERVER['REMOTE_ADDR'];
 $IP = ip2long($IP);
 
-if(isset($_SESSION['loggedin'])) {
-	$totalpoints = getPoints($_SESSION['name']);
-}
 if(array_key_exists('submit',$_POST)) {
 	$featured = isset($_POST['featured']) ? 'yes' : 'no';
 	$img1 = "";
@@ -41,6 +38,9 @@ if(array_key_exists('submit',$_POST)) {
 		}
 	$img1 = $_POST['img1'];	
 	$img2 = $_POST['img2'];
+	}
+	if(!isset($_SESSION['loggedin'])) {
+		$errmsg = "You need to be <a href='signinpage.php'>logged in</a> to do that.";
 	}
 	if(!isset($errmsg)) {
 	$newMID = createMatch($submitinput1, $submitinput2, $_SESSION['name'], $IP, $event, $description, $featured, $img1, $img2);
@@ -153,11 +153,8 @@ include 'user.php';
 ?>
 <?php
 if(isset($errmsg)) {
-	echo "<div style='color:red'>" . $errmsg . "</div>";
+	echo "<div class='error'>" . $errmsg . "</div>";
 }
-
-/* User is logged in */
-if(isset($_SESSION['loggedin'])) {
 	if(isset($_GET['mid']) and !empty($_GET['mid']) and ctype_digit($_GET['mid'])) {
 		$match_ID = $_GET['mid'];
 		$match_ID = $mysqli->real_escape_string($match_ID);
@@ -328,18 +325,10 @@ if(isset($_SESSION['loggedin'])) {
 		Featured?<input class='featured' type='checkbox' name='featured' title='Your matchup will be featured on the front page. Two images are required for featured matches.'>
 		<input class='form_box' style='position:relative;left:15px' type='text' name='img2' placeholder='Paste Image URL Here' autocomplete='off'><br>
 		</div>
-		
+
 		<input class='form_submit' type='image' src='IS/submit.png' name='submit' value='Submit'/>
 		</div>";
 	}
-}
-
-/* User is not signed in */
-else {
-	echo "<a href='signuppage.php'>Register</a><br/>";
-	echo "<a href='signinpage.php'>Log In</a>";
-}
-
 
 ?>
 

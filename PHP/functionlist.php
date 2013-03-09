@@ -59,6 +59,10 @@ function minusPoints($value, $user) {
 function createMatch($input1, $input2, $user, $ip, $event, $description, $featured, $img1, $img2) {
 	global $mysqli;
 	$matchID;
+	$input1 = strip_tags($input1);
+	$input2 = strip_tags($input2);
+	$event = strip_tags($event);
+	$description = strip_tags($description);
 	if($stmt = $mysqli->prepare("INSERT INTO bets_matches (`Input 1`, `Input 2`, `Mod`, `IP`, `Event`, `Description`, `isfeatured`, `img1`, `img2`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)")) {
 		$stmt->bind_param("sssisssss", $input1, $input2, $user, $ip, $event, $description, $featured, $img1, $img2);
 		$stmt->execute();

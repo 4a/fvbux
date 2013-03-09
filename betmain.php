@@ -11,7 +11,7 @@ require('PHP/functionlist.php');
 <link rel="stylesheet" type="text/css" href="CSS/newfightans.css">
 <link rel="stylesheet" type="text/css" href="CSS/tempstyles.css">
 <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js" type="text/javascript"></script>
-<script type="text/javascript" src="JS/idtabs.js"></script>
+<script src="JS/s3Slider.js" type="text/javascript"></script>
 <style>
 #content
 {
@@ -116,6 +116,17 @@ padding-bottom:5px;
 margin-bottom:40px;
 }
 
+.col_block a
+{
+color:#989eae;
+font-family: Trebuchet, arial, sans-serif;
+}
+
+.col_block a:hover
+{
+color:#d24d04;
+}
+
 .lb-rank
 {
 padding-top:5px;
@@ -150,10 +161,56 @@ font-size:16px;
 
 .featured
 {
-height:353px;
+height:350px;
 width:640px;
 overflow:hidden;
 position:relative;
+}
+
+#s3slider {
+    width: 640px; /* important to be same as image width */
+    height: 350px; /* important to be same as image height */
+    position: relative; /* important */
+}
+ 
+#s3sliderContent {
+    width: 640px; /* important to be same as image width or wider */
+    position: absolute; /* important */
+    top: 0px; /* important */
+	right:0px;
+	margin:0px;
+	padding:0px;
+}
+ 
+.s3sliderImage {
+	position:relative;
+    display: none; /* important */
+}
+ 
+.s3sliderImage span {
+    position: absolute; /* important */
+    left: 0;
+    font: 15px/20px Arial, Helvetica, sans-serif;
+    padding: 10px 13px;
+    width: 640px;
+	height:75px;
+    background-color: #000;
+    filter: alpha(opacity=90); /* here you can set the opacity of box with text */
+    -moz-opacity: 0.9; /* here you can set the opacity of box with text */
+    -khtml-opacity: 0.9; /* here you can set the opacity of box with text */
+    opacity: 0.9; /* here you can set the opacity of box with text */
+    color: #fff;
+    display: none; /* important */
+    bottom: 0px; /*
+        if you put top: 0;  -> the box with text will be shown 
+                                at the top of the image
+        if you put bottom: 0;  -> the box with text will be shown 
+                                at the bottom of the image
+    */
+}
+ 
+.clear {
+    clear: both;
 }
 </style>
 </head>
@@ -163,17 +220,54 @@ include('menu.php');
 include('user.php');
 
 $MatchImage = new TalkPHP_Gravatar();
-
 ?>
+
 <div id='content'>
 
 	<div class='matches'>
-
 		<div class="featured">
+<div id='s3slider'>
+	<ul id='s3sliderContent'>
+<?php
+
+if($stmt = $mysqli->prepare("SELECT `ID`, `Input 1`, `Input 2`, `Mod`, `Event`, `Description`, `img1`, `img2` FROM `bets_matches` 
+	WHERE `isfeatured` = 'yes' AND `status` = 'open' ORDER BY `ID` DESC LIMIT 10")) {
+	$stmt->execute();
+	$stmt->bind_result($matchNo, $name1, $name2, $mod, $event, $description, $img1, $img2);
+	while ($stmt->fetch()) {
+		echo " 
+		<li class='s3sliderImage'>
+		<div>
+		<img style='width:50%;height:350px' src='". $img1 ."'/>
+		<img style='position:absolute;right:0px;width:50%;height:350px' src='". $img2 ."'/>
+		<div style='z-index:9999;position:absolute;top:0;left:0'><a href='bets.php?mid=". $matchNo ."'><img src='IS/VS.png'/></a></div>
+		</div>	
+        <span>"
+		. $event 
+		."<br>"
+		. $description
+		."</span>
+        </li>
+		";
+	}
+}
+?>	
+		<div class='clear s3sliderImage'></div>
+    </ul>
+</div>
+<script type='text/javascript'>
+$(document).ready(function() { 
+    $('#s3slider').s3Slider({
+        timeOut: 6000
+    });
+});
+</script>
+<!--	
 		<div style="position:absolute;z-index:99999;bottom:0;height:50px;width:640px;background:rgba(0, 0, 1, 0.8);">Placeholder</div>
 		<img style="width:50%;height:353px" src="IS/chrisg.png"/>
 		<img style="position:absolute;right:0px;width:50%;height:353px" src="IS/fchamp.png"/>
 		<div style="z-index:9999;position:absolute;top:0;left:0"><img src="IS/VS.png" width='640px'/></div>
+-->		
 		</div>
 <a href='bets.php'>New Match</a>
 		<div id='matchesBox'>
@@ -200,7 +294,7 @@ $MatchImage = new TalkPHP_Gravatar();
 		/* Need the user meta table and link the <img> tag to their avatar 
 			And also fill in the missing info when the sql tables are updated with it*/
 		$currenttime = strtotime('now');
-		$timelimit = daysToSeconds(1);
+		$timelimit = daysToSeconds(3);
 		$timestamp = strtotime($result['Timestamp']);
 		
 		if(($currenttime - $timestamp) > $timelimit) {

@@ -114,16 +114,27 @@ text-shadow: 0px 3px 2px rgba(0, 0, 0, .5);
 
 .pb_choice
 {
-background:url('IS/choice_bg.gif') repeat-x;
-font-size:35px;
-font-weight:bold;
-height:75px;
-line-height:75px;
+background:#3d4fcd url('IS/choice_bg.gif') repeat-x;
+min-height:75px;
 width:300px;
 margin:auto;
 -webkit-box-shadow: 0px 5px 5px rgba(0, 0, 0, 0.2);
 -moz-box-shadow:    0px 5px 5px rgba(0, 0, 0, 0.2);
 box-shadow:         0px 5px 5px rgba(0, 0, 0, 0.2);
+border-top:1px solid #aecffc;
+border-bottom:1px solid #262acb;
+}
+
+.pb_choice p
+{
+font-size:35px;
+font-weight:bold;
+display:table-cell;
+vertical-align: middle;
+text-align:center;
+height:75px;
+width:200px;
+overflow:hidden;
 }
 
 .pb_choice img
@@ -163,7 +174,7 @@ if(isset($_SESSION['loggedin']))
    echo "<div class='pb_amount'>You have bet <span class='fvbux'>$</span>" . $betvalue . " on</div>";
    echo "<div class='pb_choice'>";
    if(!empty($user1img)){echo "<img src='". $user1img ."'/>";}
-   echo $user1choice ."</div>";
+   echo "<p>". $user1choice ."</p></div>";
    echo "<br>No one has bet against you yet.<br>";
    echo "Share URL <div id='zclip_button' href='#'></div>"; 
    echo "<input id='url' name='share_url' value='" . $shareurl . "' readonly onClick='this.select()'/>";
@@ -190,9 +201,9 @@ if(isset($_SESSION['loggedin']))
     });
 	});
 </script>";
-   echo "<br /><br /><form action='cancelbet.php' method='POST'>
+   echo "<br /><br /><form action='cancelbet.php' method='POST' onsubmit=\"return confirm('Erase this bet?')\" />
 			<input type='hidden' name='betid' value='" . $_GET['bid'] . "'>
-			<input type='image' src='IS/tick.png' name='submit'>
+			<input type='image' src='IS/cancel.png' style='margin-bottom:20px' name='submit'>
 			</form>";		
    echo "</div>";
   }
