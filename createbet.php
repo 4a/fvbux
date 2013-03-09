@@ -352,7 +352,7 @@ onsubmit="return confirm('You are betting ' + $('input[name=betamount]', '#creat
 	<div class='slip_private'>Private? <input type='checkbox' name='private'>
 	<br>(Your bet will be unlisted but it may still be challenged by anyone)</div>		
 </div>
-<input type='image' src='IS/submit.png' name='submit' alt='Submit' />
+<input type='image' src='IS/submit.png' name='submit' alt='Submit' value='Submit'/>
 </form>	
 
 </body>
