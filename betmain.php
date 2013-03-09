@@ -165,6 +165,7 @@ height:350px;
 width:640px;
 overflow:hidden;
 position:relative;
+background: #000;
 }
 
 #s3slider {
@@ -269,7 +270,7 @@ $(document).ready(function() {
 		<div style="z-index:9999;position:absolute;top:0;left:0"><img src="IS/VS.png" width='640px'/></div>
 -->		
 		</div>
-<a href='bets.php'>New Match</a>
+<a href='creatematch.php'>New Match</a>
 		<div id='matchesBox'>
 		<?php
 	if($stmt = $mysqli->prepare("SELECT `ID`, `Input 1`, `Input 2`, `Mod`, `Timestamp`, `Event`, `Description` FROM `bets_matches` 

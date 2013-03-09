@@ -144,6 +144,21 @@ include('user.php');
 			$meta = New UserMetaInfo($username);
 			$gravemail = $meta->getGravEmail();
 			$location = $meta->getLocation();
+			if ( isset($_SESSION['loggedin']) && ( !(empty($_SESSION['lat']) || empty($_SESSION['long'])) ) ) {
+				$mylat = $_SESSION['lat'];
+				$mylong = $_SESSION['long'];
+				$lat = $meta->getLatitude();
+				$long = $meta->getLongitude();
+				if ( !(empty($lat) || empty($long)) ) {
+				$distance = distance($mylat, $mylong, $lat, $long, FALSE);
+				$latency = 1000 * $distance / 299792.458;
+				$distance = round($distance) ."km from you (". round($latency) ." ms)";
+				} else {
+				$distance = "";
+				}
+			} else {
+			$distance = "";
+			}
 			$proGravatar = new TalkPHP_Gravatar();
 			$proGravatar->setEmail($gravemail);
 			$proGravatar->setSize(100);
@@ -165,6 +180,8 @@ include('user.php');
 			<?php echo $profilename ?>
 			<br>
 			<?php echo $location ?>
+			<br>
+			<?php echo $distance ?>
 			<br>
 			<span class='fvbux'>$</span><?php echo $points ?>
 		</div>

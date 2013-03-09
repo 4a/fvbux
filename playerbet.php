@@ -2,53 +2,73 @@
 session_start();
 require('PHP/functionlist.php');
 
-if(isset($_GET['bid']))
-{
-if(ctype_digit($_GET['bid'])) {
-$BetInfo = new BetInfo($_GET['bid']);
-                $betid = $BetInfo->getBetID();
-                $match_ID = $BetInfo->getMatchID();
-                $user1 = $BetInfo->getUser1();
-                $user2 = $BetInfo->getUser2();
-                $betvalue = $BetInfo->getBetValue();
-                $user1ip = $BetInfo->getUser1IP();
-                $status = $BetInfo->getStatus();
-                $isprivate = $BetInfo->isPrivate();
-                $user1choice = $BetInfo->getUser1Choice();
+if(isset($_GET['bid'])) {
 
-                $Match = new MatchInfo($match_ID);
-                $matchid = $Match->getMatchID();
-                $input1 = $Match->getInput1();
-                $input2 = $Match->getInput2();
-                $mod = $Match->getMod();
-                $modip = $Match->getModIP();
-                
-                if ($user1choice === $input1) {
-                  $user2choice = $input2;
-				  $user1img = $Match->getImg1();
-				  $user2img = $Match->getImg2();
-                } else {
-                  $user2choice = $input1;
-				  $user1img = $Match->getImg2();
-				  $user2img = $Match->getImg1();
-                }
+	if(ctype_digit($_GET['bid'])) {
+	
+		$BetInfo = new BetInfo($_GET['bid']);
+		$betid = $BetInfo->getBetID();
+		$match_ID = $BetInfo->getMatchID();
+		$user1 = $BetInfo->getUser1();
+		$user2 = $BetInfo->getUser2();
+		$betvalue = $BetInfo->getBetValue();
+		$user1ip = $BetInfo->getUser1IP();
+		$status = $BetInfo->getStatus();
+		$isprivate = $BetInfo->isPrivate();
+		$user1choice = $BetInfo->getUser1Choice();
+		
+		$winner = $BetInfo->getBetWinner();
+		if ($winner === $user1) {
+			$loser = $user2;
+		} else {
+			$loser = $user1;
+		}	
 
-                if(isset($_SESSION['loggedin'])) {
-                $totalpoints = getPoints($_SESSION['name']);
-                if (empty($user2)) {
-                  $user2 = $_SESSION['name'];}
-                }
-                
-                $IP = $_SERVER['REMOTE_ADDR'];
-                $IP = ip2long($IP);
+		$Match = new MatchInfo($match_ID);
+		$matchid = $Match->getMatchID();
+		$input1 = $Match->getInput1();
+		$input2 = $Match->getInput2();
+		$mod = $Match->getMod();
+		$modip = $Match->getModIP();
 
-                $shareurl = "http://".$_SERVER["HTTP_HOST"].$_SERVER["REQUEST_URI"];
+		if ($user1choice === $input1) {
+			$user2choice = $input2;
+			$user1img = $Match->getImg1();
+			$user2img = $Match->getImg2();
+		} else {
+			$user2choice = $input1;
+			$user1img = $Match->getImg2();
+			$user2img = $Match->getImg1();
+		}
+			
+		$IP = $_SERVER['REMOTE_ADDR'];
+		$IP = ip2long($IP);
 
-                if(array_key_exists('submit',$_POST)) {
-$status = challengeBet($betid, $user2, $betvalue);
-                }
-}
+		$shareurl = "http://".$_SERVER["HTTP_HOST"].$_SERVER["REQUEST_URI"];
 
+		if(array_key_exists('submit',$_POST)) {
+			if(!isset($_SESSION['loggedin'])) {
+				$errmsg = "You need to be <a href='signinpage.php'>logged in</a> to do that.";
+			} else {
+				$totalpoints = getPoints($_SESSION['name']);
+				if (empty($user2)) {
+					$user2 = $_SESSION['name'];
+				}
+				if ($totalpoints < $betvalue) {
+					$errmsg = "You are too poor to participate in this bet.";
+				}				
+				if (($_SESSION['name'] === $mod) || ($IP === $modip && !$IPBYPASS)) {
+					$errmsg = "You are the moderator ya cunt!";
+				}
+				if ($IP === $user1ip && !$IPBYPASS) {
+					$errmsg = "You can't bet against yourself.";
+				}
+			}			
+			if(!isset($errmsg)) {	
+				$status = challengeBet($betid, $user2, $betvalue);
+			}	
+		}
+	}
 }
 
 ?>
@@ -150,107 +170,77 @@ float:left;
 <?php
 include 'menu.php';
 include 'user.php';
+if(isset($errmsg)) {
+	echo "<div class='error'>" . $errmsg . "</div>";
+}
 ?>
 
 <?php
-if(isset($_SESSION['loggedin']))
-{
+	if ($status === "open") {
+		if ( (isset($_SESSION['loggedin'])) && ($user1 === $_SESSION['name']) ){ /* logged in as bet creator. share url page */
+			echo "<div id='share'>";
+			echo "<div class='pb_amount'>You have bet <span class='fvbux'>$</span>" . $betvalue . " on</div>";
+			echo "<div class='pb_choice'>";
+			if(!empty($user1img)){echo "<img src='". $user1img ."'/>";}
+			echo "<p>". $user1choice ."</p></div>";
+			echo "<br>No one has bet against you yet.<br>";
+			echo "Share URL <div id='zclip_button' href='#'></div>"; 
+			echo "<input id='url' name='share_url' value='" . $shareurl . "' readonly onClick='this.select()'/>";
+			echo "<div id='success' class='hidden'>Copied to clipboard</div>";	
+			echo "<script type='text/javascript'>
+				$(document).ready(function(){
+				$('#zclip_button').zclip({
+				path:'JS/ZeroClipboard.swf',
+				copy:$('input#url').val(),
+				beforeCopy:function(){
+				$('input#url').css('background-position','0px 27px');
+				$(this).css('background-position','0px 25px');
+				$(this).css('border-bottom','1px solid #afd0f9');
+				$(this).css('border-top','1px solid #1824ae');
+				$('#success').hide();
+				},
+				afterCopy:function(){
+				$('input#url').css('background-position','0px 0px');
+				$(this).css('background-position','0px 0px');
+				$(this).css('border-top','1px solid #afd0f9');
+				$(this).css('border-bottom','1px solid #1824ae');
+				$('#success').fadeIn(1000);
+				}
+				});
+				});
+				</script>";
+			echo "<br /><br /><form action='cancelbet.php' method='POST' onsubmit=\"return confirm('Erase this bet?')\" />
+				<input type='hidden' name='betid' value='" . $_GET['bid'] . "'>
+				<input type='image' src='IS/cancel.png' style='margin-bottom:20px' name='submit'>
+				</form>";		
+			echo "</div>";
+		}
+		
+		else { /* not logged in as bet creator */
+			echo $user1 . " is betting " . $betvalue . " on " . $user1choice . " in the match-up:";
+			echo "<h1>" . $input1 . "</h1>";
+			echo "<h4>VS</h4>";
+			echo "<h1>" . $input2 . "</h1>";
+			echo "where the winner is chosen by " . $mod . ".";
+			echo "<br>Would you like to bet " . $betvalue . " on " . $user2choice . "?";
+			echo "<form action='$_SERVER[REQUEST_URI]' method='post'>
+				<input type='submit' name='submit' value='Place Bet' />";
+		}
+	}
+	
+	else if ($status === "locked") { /* winner not determined. bet challenged */
+		echo "This bet is locked.<br>";
+		echo $user2 . " agreed to bet " . $betvalue . " against " . $user1 . " in the match-up:";
+		echo "<h1>" . $input1 . "</h1>";
+		echo "<h4>VS</h4>";
+		echo "<h1>" . $input2 . "</h1>";
+		echo "where the winner is chosen by " . $mod . ".";
+	}
 
- if ($status === "open")
- {
-  if (($_SESSION['name'] === $mod) || ($IP === $modip && !$IPBYPASS))
-  {
-   echo "You can't bet on match-ups where you are the moderator.";
-  }
-
-  else if (($user1 !== $_SESSION['name']) && ($IP === $user1ip && !$IPBYPASS))
-  {
-   echo "You can't bet against yourself.";
-  }
-
-  else if ($user1 === $_SESSION['name'])
-  {
-   echo "<div id='share'>";
-   echo "<div class='pb_amount'>You have bet <span class='fvbux'>$</span>" . $betvalue . " on</div>";
-   echo "<div class='pb_choice'>";
-   if(!empty($user1img)){echo "<img src='". $user1img ."'/>";}
-   echo "<p>". $user1choice ."</p></div>";
-   echo "<br>No one has bet against you yet.<br>";
-   echo "Share URL <div id='zclip_button' href='#'></div>"; 
-   echo "<input id='url' name='share_url' value='" . $shareurl . "' readonly onClick='this.select()'/>";
-   echo "<div id='success' class='hidden'>Copied to clipboard</div>";	
-   echo "<script type='text/javascript'>
-	$(document).ready(function(){
-    $('#zclip_button').zclip({
-        path:'JS/ZeroClipboard.swf',
-		copy:$('input#url').val(),
-        beforeCopy:function(){
-            $('input#url').css('background-position','0px 27px');
-            $(this).css('background-position','0px 25px');
-			$(this).css('border-bottom','1px solid #afd0f9');
-			$(this).css('border-top','1px solid #1824ae');
-			$('#success').hide();
-        },
-        afterCopy:function(){
-            $('input#url').css('background-position','0px 0px');
-            $(this).css('background-position','0px 0px');
-			$(this).css('border-top','1px solid #afd0f9');
-			$(this).css('border-bottom','1px solid #1824ae');
-            $('#success').fadeIn(1000);
-        }
-    });
-	});
-</script>";
-   echo "<br /><br /><form action='cancelbet.php' method='POST' onsubmit=\"return confirm('Erase this bet?')\" />
-			<input type='hidden' name='betid' value='" . $_GET['bid'] . "'>
-			<input type='image' src='IS/cancel.png' style='margin-bottom:20px' name='submit'>
-			</form>";		
-   echo "</div>";
-  }
-
-  else if ($totalpoints < $betvalue)
-  {
-   echo "You are too poor to participate in this bet.";
-  }
-
-  else
-  {
-  echo $user1 . " is betting " . $betvalue . " on " . $user1choice . " in the match-up:";
-  echo "<h1>" . $input1 . "</h1>";
-  echo "<h4>VS</h4>";
-  echo "<h1>" . $input2 . "</h1>";
-  echo "where the winner is chosen by " . $mod . ".";
-  echo "<br>Would you like to bet " . $betvalue . " on " . $user2choice . "?";
-  echo "
-<form action='$_SERVER[REQUEST_URI]' method='post'>
-<input type='submit' name='submit' value='Place Bet' />
-";
-  }
-
- }
-
- else if ($status === "locked")
- {
-  echo "This bet is locked.<br>";
-  echo $user2 . " agreed to bet " . $betvalue . " against " . $user1 . " in the match-up:";
-  echo "<h1>" . $input1 . "</h1>";
-  echo "<h4>VS</h4>";
-  echo "<h1>" . $input2 . "</h1>";
-  echo "where the winner is chosen by " . $mod . ".";
- }
-
- else
- {
-  echo "This match has ended.";
- }
-
-}
-
-else
-{
- echo "You have to be logged in.";
-}
-
+	else { /* winner selected. bet status is closed. */
+		echo "This match has ended.<br>";
+		echo $winner ." stole <span class='fvbux'>$</span>". $betvalue ." from ". $loser;
+	}
 ?>
 
 </body>

@@ -43,14 +43,15 @@ if(array_key_exists('submit',$_POST)) {
 		if($betamount > $totalpoints) {
 			$errmsg = "You're too poor to do that.";
 		}
-		if($username === $Match->getMod() || ($IP = $Match->getModIP() && !$IPBYPASS)) {
+		if($username === $Match->getMod() || (($IP == $Match->getModIP()) && !($IPBYPASS))) {
 			$errmsg = "You are the moderator ya cunt!";
 		}
 	}
 	if(!isset($errmsg)) {
-		$betID = createBet($match_ID, $username, $betamount, $IP, $private, $user1choice);
+		$betID = createBet($match_ID, $username, $betamount, $IP, $private, $user1choice);	
 		//create new page (new php page?) so the user can pass around the link and we can link to it publicly
-		header('Location: playerbet.php?bid=' . $betID);
+		header('Location:playerbet.php?bid='.$betID);
+		exit;
 	}
 }
 ?>
@@ -64,6 +65,15 @@ if(array_key_exists('submit',$_POST)) {
 <link rel="stylesheet" type="text/css" href="CSS/tempstyles.css">
 <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js" type="text/javascript"></script>
 <style>
+
+.submit
+{
+background: url('IS/submit.png') no-repeat;
+border: none;
+width:83px;
+height:31px;
+cursor:pointer;
+}
 
 #createbet
 {
@@ -309,6 +319,7 @@ if(isset($errmsg)) {
 	echo "<div class='error'>" . $errmsg . "</div>";
 }
 ?>
+
 <form id='createbet' action='<?php echo $_SERVER['PHP_SELF'] ."?mid=". $match_ID; ?>' method='POST' 
 onsubmit="return confirm('You are betting ' + $('input[name=betamount]', '#createbet').val() + ' FV Bux on ' + $('input[name=winner]:checked', '#createbet').val() + '.\nIs this correct?')">
 
@@ -352,7 +363,7 @@ onsubmit="return confirm('You are betting ' + $('input[name=betamount]', '#creat
 	<div class='slip_private'>Private? <input type='checkbox' name='private'>
 	<br>(Your bet will be unlisted but it may still be challenged by anyone)</div>		
 </div>
-<input type='image' src='IS/submit.png' name='submit' alt='Submit' value='Submit'/>
+<input type='submit' class='submit' name='submit' value=''/>
 </form>	
 
 </body>

@@ -10,7 +10,9 @@ $UserInfo = new UserInfo($_SESSION['name']);
 if($_SERVER['REQUEST_METHOD'] == 'POST') {	
 		if(!isset($errmsg)) {
 				updateProfile($_SESSION['name'], $_POST['gravemail'], $_POST['location'], $_POST['lat'], $_POST['long'], $_POST['GGPO'], $_POST['LIVE'], $_POST['PSN']);	
-$_SESSION['email'] = $_POST['gravemail'];				
+$_SESSION['email'] = $_POST['gravemail'];
+$_SESSION['lat'] = $_POST['lat'];
+$_SESSION['long'] = $_POST['long'];			
 		}
 }
 

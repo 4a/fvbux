@@ -12,7 +12,7 @@ if(array_key_exists('submit',$_POST)) {
 	$username = $_POST['username'];
 	$password = $_POST['password'];
 
-	if(!($stmt = $mysqli->prepare("SELECT user.password, user.acclevel, user_meta.gravemail AS gravemail FROM user,user_meta WHERE user.username=? AND user_meta.uid =?"))) {
+	if(!($stmt = $mysqli->prepare("SELECT user.password, user.acclevel, user_meta.gravemail, user_meta.lat, user_meta.long FROM user,user_meta WHERE user.username=? AND user_meta.uid =?"))) {
 		echo "Prepare failed: (" . $mysqli->errno . ") " . $mysqli->error;
 	}
 
@@ -24,7 +24,7 @@ if(array_key_exists('submit',$_POST)) {
 		echo "Execute failed: (" . $stmt->errno . ") " . $stmt->error;
 	}
 
-	$stmt->bind_result($passhash, $acclevel, $email);
+	$stmt->bind_result($passhash, $acclevel, $email, $lat, $long);
 	$stmt->fetch();
 	$Hasher = new PasswordHash(8, FALSE);
 
@@ -33,6 +33,8 @@ if(array_key_exists('submit',$_POST)) {
 		$_SESSION['name'] = $username;
 		$_SESSION['level'] = $acclevel;
 		$_SESSION['email'] = $email;
+		$_SESSION['lat'] = $lat;
+		$_SESSION['long'] = $long;
 		
 		if (isset($_POST['return'])){
 		header('Location: '.$_POST['return']);

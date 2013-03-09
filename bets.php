@@ -176,29 +176,60 @@ if(isset($errmsg)) {
 /* Match ID in mid parameter exists */
 		if($matchid == $match_ID) {
 
-/* Match status is open */
+	/* Match status is open */
 			if ($matchstatus === "open") {
 
-/* Moderator Options - Winner selection and bet freezing */
+		/* Moderator Options - Winner selection and bet freezing */
 				if ($_SESSION['name'] === $mod) {
 					echo "<h1>" . $input1 . "</h1>
-                                        <form action='declarewinner.php' method='POST'>
+                    <form id='winner1' action='declarewinner.php' method='POST' 
+					onsubmit=\"return confirm($('input[name=winner]', '#winner1').val() + ' is the winner?')\">
 					<input type='hidden' name='matchid' value='" . $match_ID . "'>
 					<input type='hidden' name='winner' value='" . $input1 . "'>
                                         <input type='image' src='IS/tick.png' name='submit'>
 					</form>";
 					echo "<h4>VS</h4>";
 					echo "<h1>" . $input2 . "</h1>
-					<form action='declarewinner.php' method='POST'>
+					<form id='winner2' action='declarewinner.php' method='POST'
+					onsubmit=\"return confirm($('input[name=winner]', '#winner2').val() + ' is the winner?')\">
 					<input type='hidden' name='matchid' value='" . $match_ID . "'>
 					<input type='hidden' name='winner' value='" . $input2 . "'>
 					<input type='image' src='IS/tick.png' name='submit'>
 					</form>";
 					echo "You are the moderator";
 					echo "<br>Betting status: Open";
+				
+				/* Begin list of open bets */
+					echo "<br><br><div id='open_bets'>Open Bets:<br>";
+					$stmt = $mysqli->prepare("SELECT `ID`, `username 1`, `value`, `user1choice` FROM `bets_money` WHERE (`match`=? AND `status`='open' AND `private`=0) ");
+					$stmt->bind_param("s", $match_ID);
+					$stmt->execute();
+					$stmt->bind_result($betNo, $user1name, $betvalue, $user1choice);
+					$i = 1;
+					while ($stmt->fetch()) {
+						echo $i++ .". <a href='playerbet.php?bid=". $betNo ."'> ". $betvalue ." FVBux on ". $user1choice ."</a>
+						[<a href='players.php?user=". $user1name ."'>". $user1name ."</a>]<br>";
+					}
+					echo "</div>";
+				/* End list of open bets */
+
+				/* Begin list of locked bets */
+					echo "<br><br><div id='open_bets'>Locked Bets:<br>";
+					$stmt = $mysqli->prepare("SELECT `ID`, `username 1`, `value`, `user1choice`, `username 2` FROM `bets_money` WHERE (`match`=? AND `status`='locked' AND `private`=0) ");
+					$stmt->bind_param("s", $match_ID);
+					$stmt->execute();
+					$stmt->bind_result($betNo, $user1name, $betvalue, $user1choice, $user2name);
+					$i = 1;
+					while ($stmt->fetch()) {
+						echo $i++ .". <a href='playerbet.php?bid=". $betNo ."'> ". $betvalue ." FVBux</a>
+						[<a href='players.php?user=". $user2name ."'>". $user2name ."</a>]
+						[<a href='players.php?user=". $user1name ."'>". $user1name ."</a>]<br>";
+					}
+					echo "</div>";
+				/* End list of locked bets */				
 				}
 
-/* Cheating Prevention - Moderator tried to bet with a different account */
+			/* Cheating Prevention - Moderator tried to bet with a different account */
 				else if ($IP == $modip and !$IPBYPASS) {
 					echo "<h1>" . $input1 . "</h1>";
 					echo "<h4>VS</h4>";
@@ -206,7 +237,7 @@ if(isset($errmsg)) {
 				        echo "<div style='color:red'>You have the same IP as the moderator</div>";
 				}
 
-/* Normal User Page - Select from list of bets or create a new one */
+		/* Normal User Page - Select from list of bets or create a new one */
 				else {
 					echo "<h1>" . $input1 . "</h1>";
 					echo "<h4>VS</h4>";
@@ -235,7 +266,7 @@ if(isset($errmsg)) {
 /* Match status is locked */
 			else if ($matchstatus === "locked") {
 
-/* Moderator Options - Winner selection and bet freezing */
+	/* Moderator Options - Winner selection and bet freezing */
 				if ($_SESSION['name'] === $mod) {
 					echo "<h1>" . $input1 . "</h1>
      <form action='declarewinner.php' method='POST'>
@@ -253,7 +284,7 @@ if(isset($errmsg)) {
 					echo "You are the moderator";
 					echo "<br>Betting status: Locked";
 				}
-/* Normal User Page - Betting is locked, winner not decided yet */
+	/* Normal User Page - Betting is locked, winner not decided yet */
 				else {
                                         echo "<h1>" . $input1 . "</h1>";
 					echo "<h4>VS</h4>";
@@ -288,47 +319,11 @@ if(isset($errmsg)) {
 
 /* Match ID (mid) is invalid */
 		else {
-			echo "Error: Match does not exist in database.<br>
-			<form action='$_SERVER[PHP_SELF]' method='post'>
-			<input type='text' name='input1'>
-			<br>VS<br>
-			<input type='text' name='input2'><br />
-			<input type='submit' name='submit' value='Submit' />";
+			echo "Error: Match does not exist in database.<br>";
 		}
 	}
 
-/* Moderate and Create Match Form - No match ID (mid) is set */
-	else {
-		echo "
-		<div id='form_mCreate'>
-		<div id='form_head'></div>
-		<div class='form_text'>
-		This is the submission form for creating and moderating a matchup.
-		<br>As a moderator, you cannot bet on an outcome.
-		<br>You will have the opportunity to earn fvbux based on the amount of people who have participated in your matchup.
-		</div>
-		<form action='$_SERVER[PHP_SELF]' method='post'>
-		
-		<div>
-		<input class='form_event' type='text' name='event' placeholder='EVENT TITLE' autocomplete='off'><br>
-		<textarea class='form_description' wrap='physical' name='description' placeholder='Description' autocomplete='off'></textarea><br>
-		</div>
-		
-		<div>
-		<input class='form_box' style='position:relative;bottom:30px;right:15px' type='text' name='input1' placeholder='SCRUBLORD 1' autocomplete='off'>
-		<img src='IS/VS2.png' alt='VS'/>
-		<input class='form_box' style='position:relative;bottom:30px;left:15px' type='text' name='input2' placeholder='SCRUBLORD 2' autocomplete='off'><br>
-		</div>
-		
-		<div style='font-size:15px'>
-		<input class='form_box' style='position:relative;right:15px' type='text' name='img1' placeholder='Paste Image URL Here' autocomplete='off'>
-		Featured?<input class='featured' type='checkbox' name='featured' title='Your matchup will be featured on the front page. Two images are required for featured matches.'>
-		<input class='form_box' style='position:relative;left:15px' type='text' name='img2' placeholder='Paste Image URL Here' autocomplete='off'><br>
-		</div>
 
-		<input class='form_submit' type='image' src='IS/submit.png' name='submit' value='Submit'/>
-		</div>";
-	}
 
 ?>
 
