@@ -319,4 +319,66 @@ class UserMetaInfo {
 	public function getLIVE() { return $this->LIVE; }
 	public function getPSN() { return $this->PSN; }
 }
+
+function matchTimeout() {
+global $mysqli;
+/* select match id's from open or locked matches older than 1 day */
+if($stmt = $mysqli->prepare("SELECT `ID` FROM `bets_matches` WHERE (`status` = 'open' OR `status` = 'locked') AND `timestamp` < now() - interval 1 day")) {
+	$stmt->execute();
+	$matchNos = array();
+	$stmt->bind_result($matchNo);
+
+	while ( $stmt->fetch() ) {
+		$matchNos[] = $matchNo;
+	}
+
+	foreach($matchNos as $id) {
+	/* Change status of bets_matches to 'timeout' */
+		if($stmt1 = $mysqli->prepare("UPDATE `bets_matches` SET `status` = 'timeout' WHERE `ID` = ?")) {
+			$stmt1->bind_param("i", $id);
+			$stmt1->execute();
+		} else {
+			echo "Prepare failed: (" . $mysqli->errno . ") " . $mysqli->error;
+		}
+		
+	/* Select bet values and names from bets_money  */
+		if($stmt = $mysqli->prepare("SELECT `value`, `username 1`, `username 2` FROM bets_money WHERE `match`=?")) {
+			$stmt->bind_param("i", $id);
+			$stmt->execute();
+			$refunds = Array();
+			$stmt->bind_result($betvalues, $user1, $user2);
+			
+			while( $stmt->fetch() ) {
+				$refunds[] = array( 'user1' => $user1, 'user2' => $user2, 'betvalue' => $betvalues);
+			}
+	/* Calculate sum of user's bets for less mysql queries */
+			$sum = array_reduce($refunds, function($result, $item) {
+				if (!isset($result[$item['user1']])) $result[$item['user1']] = 0;
+				if (!isset($result[$item['user2']])) $result[$item['user2']] = 0;
+				$result[$item['user1']] += $item['betvalue'];
+				$result[$item['user2']] += $item['betvalue'];
+				return $result;
+			}, array());
+
+	/* Refund betvalues to usernames in user */			
+			foreach ($sum as $user => $value) {					
+			if(!empty($user) && $stmt = $mysqli->prepare("UPDATE user SET `points` = points + ? WHERE `username`=?")) {
+				$stmt->bind_param("is", $value, $user);
+				$stmt->execute();
+				echo $user ." refunded ". $value ." FVBUX.<br>";
+				}
+			}			
+		}
+		
+	/* Change status of any bets that are linked to that match to 'timeout' */ 		
+		if($stmt2 = $mysqli->prepare("UPDATE `bets_money` SET `status`='timeout' WHERE `match`=?")) {
+			$stmt2->bind_param("i", $id);
+			$stmt2->execute();
+		} else {
+			echo "Prepare failed: (" . $mysqli->errno . ") " . $mysqli->error;
+		}	
+	}
+
+	}
+}
 ?>

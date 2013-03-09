@@ -27,16 +27,25 @@ if($_SERVER['REQUEST_METHOD'] == 'POST') {
 			if($stmt = $mysqli->prepare("SELECT `value`, `username 1` FROM bets_money WHERE (`match`=? AND `status`='open')")) {
 				$stmt->bind_param("i", $_POST['matchid']);
 				$stmt->execute();
-				$results = Array();
-				$stmt->bind_result($betvalues, $winners);
+				$refunds = Array();
+				$stmt->bind_result($betvalues, $users);
                                 while( $stmt->fetch() ) {
-                                	$results[] = array( winner => $winners, betvalue => $betvalues);
+                                	$refunds[] = array( 'user' => $users, 'betvalue' => $betvalues);
                                 }
-                                foreach ($results as $result) {
+			/* Calculate sum of user's bets for less mysql queries */
+								$sum = array_reduce($refunds, function($result, $item) {
+									if (!isset($result[$item['user']])) $result[$item['user']] = 0;
+									$result[$item['user']] += $item['betvalue'];
+									return $result;
+								}, array());
+
+			/* Refund betvalues to usernames in user */			
+			foreach ($sum as $user => $value) {	
                                 	if($stmt = $mysqli->prepare("UPDATE user SET points = points + ? WHERE username=?")) {
-                                	$stmt->bind_param("is", $result['betvalue'], $result['winner']);
+                                	$stmt->bind_param("is", $value, $user);
                                 	$stmt->execute();
-                                	//echo "<br>Refunded ". ($result['betvalue']) ." to ". $result['winner'] ."'s points.";
+									/* test open bet refund */
+                                	//echo "No challengers! Refunded ". $value ." FVBUX to ". $user ."'s points.<br>";
                                 	}
                                 }
 			}
@@ -65,14 +74,22 @@ if($_SERVER['REQUEST_METHOD'] == 'POST') {
 				$results = Array();
 				$stmt->bind_result($betvalues, $winners);
                                 while( $stmt->fetch() ) {
-                                	$results[] = array( winner => $winners, betvalue => $betvalues );
+                                	$results[] = array( 'winner' => $winners, 'betvalue' => $betvalues );
                                 }
 								
-                                foreach ($results as $result) {
+								/* Calculate sum of user's bets for less mysql queries */
+								$sum = array_reduce($results, function($result, $item) {
+									if (!isset($result[$item['winner']])) $result[$item['winner']] = 0;
+									$result[$item['winner']] += $item['betvalue'];
+									return $result;
+								}, array());
+								
+                                foreach ($sum as $winner => $value) {
                                 	if($stmt = $mysqli->prepare("UPDATE user SET points = points + (? * 2) WHERE username=?")) {
-                                	$stmt->bind_param("is", $result['betvalue'], $result['winner']);
+                                	$stmt->bind_param("is", $value, $winner);
                                 	$stmt->execute();
-                                	//echo "<br>Added ". ($result['betvalue'] * 2) ." to ". $result['winner'] ."'s points.";
+									/* test winner */
+                                	//echo $winner ." won ". ($value * 2) ." FVBUX for betting on ". $_POST['winner'] ."!<br>";
                                     }
                                 }
 
@@ -80,6 +97,8 @@ if($_SERVER['REQUEST_METHOD'] == 'POST') {
                                 if($stmt = $mysqli->prepare("UPDATE user SET points = points + ? WHERE username=?")) {
                                	$stmt->bind_param("is", $modcut, $mod);
                                	$stmt->execute();
+								/* test mod reward */
+								//echo $mod ." rewarded ". $modcut ." FVBUX for moderating!<br>";
                                 }
 			}
 			/* Updating bets_money:
